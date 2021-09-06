@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-09-06T14:39:49Z</date>
+    <date>2021-09-06T15:25:53Z</date>
     <groups>
         <group>
             <name>Templates/Futur-Tech/Applications</name>
@@ -119,8 +119,7 @@ var minutes = match[1].substring(10,12);
 var seconds = match[1].substring(12,14);
 
 var ts = new Date(year, monthIndex, day, hours, minutes, seconds).valueOf() / 1000;
-tz = new Date().getTimezoneOffset() * 60;
-return ts + tz;</params>
+return ts;</params>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -199,8 +198,7 @@ var minutes = match[1].substring(10,12);
 var seconds = match[1].substring(12,14);
 
 var ts = new Date(year, monthIndex, day, hours, minutes, seconds).valueOf() / 1000;
-tz = new Date().getTimezoneOffset() * 60;
-return ts + tz;</params>
+return ts;</params>
                                 </step>
                             </preprocessing>
                         </item_prototype>
