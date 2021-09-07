@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-09-06T15:25:53Z</date>
+    <date>2021-09-07T09:12:07Z</date>
     <groups>
         <group>
             <name>Templates/Futur-Tech/Applications</name>
@@ -41,6 +41,38 @@
                             <name>StorageCraft ShadowProtectSPX</name>
                         </application>
                     </applications>
+                    <triggers>
+                        <trigger>
+                            <expression>{logseverity()}=9</expression>
+                            <recovery_mode>NONE</recovery_mode>
+                            <name>Critical Error detected in ShadowProtectSPX event log</name>
+                            <opdata>{{ITEM.VALUE}.regsub(&quot;(.*)&quot;, \1)}</opdata>
+                            <priority>HIGH</priority>
+                            <description>This trigger need to be manually closed.</description>
+                            <type>MULTIPLE</type>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                        <trigger>
+                            <expression>{logseverity()}=4</expression>
+                            <recovery_mode>NONE</recovery_mode>
+                            <name>Error detected in ShadowProtectSPX event log</name>
+                            <opdata>{{ITEM.VALUE}.regsub(&quot;(.*)&quot;, \1)}</opdata>
+                            <priority>AVERAGE</priority>
+                            <description>This trigger need to be manually closed.</description>
+                            <type>MULTIPLE</type>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                        <trigger>
+                            <expression>{logseverity()}=2</expression>
+                            <recovery_mode>NONE</recovery_mode>
+                            <name>Warning detected in ShadowProtectSPX event log</name>
+                            <opdata>{{ITEM.VALUE}.regsub(&quot;(.*)&quot;, \1)}</opdata>
+                            <priority>WARNING</priority>
+                            <description>This trigger need to be manually closed.</description>
+                            <type>MULTIPLE</type>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                    </triggers>
                 </item>
                 <item>
                     <name>ImageManager Log</name>
@@ -54,6 +86,38 @@
                             <name>StorageCraft ImageManager</name>
                         </application>
                     </applications>
+                    <triggers>
+                        <trigger>
+                            <expression>{logseverity()}=9</expression>
+                            <recovery_mode>NONE</recovery_mode>
+                            <name>Critical Error detected in ImageManager event log</name>
+                            <opdata>{{ITEM.VALUE}.regsub(&quot;(.*)&quot;, \1)}</opdata>
+                            <priority>HIGH</priority>
+                            <description>This trigger need to be manually closed.</description>
+                            <type>MULTIPLE</type>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                        <trigger>
+                            <expression>{logseverity()}=4</expression>
+                            <recovery_mode>NONE</recovery_mode>
+                            <name>Error detected in ImageManager event log</name>
+                            <opdata>{{ITEM.VALUE}.regsub(&quot;(.*)&quot;, \1)}</opdata>
+                            <priority>AVERAGE</priority>
+                            <description>This trigger need to be manually closed.</description>
+                            <type>MULTIPLE</type>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                        <trigger>
+                            <expression>{logseverity()}=2</expression>
+                            <recovery_mode>NONE</recovery_mode>
+                            <name>Warning detected in ImageManager event log</name>
+                            <opdata>{{ITEM.VALUE}.regsub(&quot;(.*)&quot;, \1)}</opdata>
+                            <priority>WARNING</priority>
+                            <description>This trigger need to be manually closed.</description>
+                            <type>MULTIPLE</type>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                    </triggers>
                 </item>
             </items>
             <discovery_rules>
@@ -81,12 +145,10 @@
                         <item_prototype>
                             <name>{#MACHINE_UPPER} [{#VOL}] Collapse Age</name>
                             <type>CALCULATED</type>
-                            <key>imagemanager.collapse.age[{#MACHINE_UPPER},{#VOL}]</key>
+                            <key>imagemanager.collapse.age[{#MACHINE},{#VOL}]</key>
                             <delay>15m</delay>
                             <units>uptime</units>
-                            <params>now(&quot;wmi.get[root\cimv2,SELECT TimeGenerated FROM Win32_NTLogEvent WHERE (logfile='Application') AND (SourceName='StorageCraft ImageManager') AND (EventCode=1120) AND (Message LIKE '%\\{#SITECODE}%\\{#MACHINE}%\\{#VOL}%.spi')]&#13;
-&quot;)-last(&quot;wmi.get[root\cimv2,SELECT TimeGenerated FROM Win32_NTLogEvent WHERE (logfile='Application') AND (SourceName='StorageCraft ImageManager') AND (EventCode=1120) AND (Message LIKE '%\\{#SITECODE}%\\{#MACHINE}%\\{#VOL}%.spi')]&#13;
-&quot;)</params>
+                            <params>now(&quot;wmi.get[root\cimv2,SELECT TimeGenerated FROM Win32_NTLogEvent WHERE (logfile='Application') AND (SourceName='StorageCraft ImageManager') AND (EventCode=1120) AND (Message LIKE '%\\{#SITECODE}%\\{#MACHINE}%\\{#VOL}%.spi')]&quot;)-last(&quot;wmi.get[root\cimv2,SELECT TimeGenerated FROM Win32_NTLogEvent WHERE (logfile='Application') AND (SourceName='StorageCraft ImageManager') AND (EventCode=1120) AND (Message LIKE '%\\{#SITECODE}%\\{#MACHINE}%\\{#VOL}%.spi')]&quot;)</params>
                             <applications>
                                 <application>
                                     <name>StorageCraft Dashboard</name>
@@ -95,6 +157,26 @@
                                     <name>StorageCraft ImageManager</name>
                                 </application>
                             </applications>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}&gt;129600</expression>
+                                    <name>No ImageManager Collapse of {#MACHINE_UPPER} [{#VOL}] for more than 36h</name>
+                                    <opdata>Last collapse: {ITEM.LASTVALUE1}</opdata>
+                                    <priority>WARNING</priority>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}&gt;259200</expression>
+                                    <name>No ImageManager Collapse of {#MACHINE_UPPER} [{#VOL}] for more than 72h</name>
+                                    <opdata>Last collapse: {ITEM.LASTVALUE1}</opdata>
+                                    <priority>HIGH</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>No ImageManager Collapse of {#MACHINE_UPPER} [{#VOL}] for more than 36h</name>
+                                            <expression>{Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].last()}&gt;129600</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                            </trigger_prototypes>
                         </item_prototype>
                         <item_prototype>
                             <name>{#MACHINE_UPPER} [{#VOL}] Collapse Success</name>
@@ -111,15 +193,21 @@
                                 <step>
                                     <type>JAVASCRIPT</type>
                                     <params>var match = /^(\d+)\.\d+-\d+$/gi.exec(value);
-var year = match[1].substring(0,4);
-var monthIndex = match[1].substring(4,6)-1;
-var day = match[1].substring(6,8);
-var hours = match[1].substring(8,10);
-var minutes = match[1].substring(10,12);
-var seconds = match[1].substring(12,14);
+var ts = new Date();
 
-var ts = new Date(year, monthIndex, day, hours, minutes, seconds).valueOf() / 1000;
-return ts;</params>
+ts.setUTCFullYear(match[1].substring(0,4));
+ts.setUTCMonth(match[1].substring(4,6)-1);
+ts.setUTCDate(match[1].substring(6,8));
+ts.setUTCHours(match[1].substring(8,10));
+ts.setUTCMinutes(match[1].substring(10,12));
+ts.setUTCSeconds(match[1].substring(12,14));
+ts.setUTCMilliseconds(0);
+
+return ts.valueOf() / 1000;</params>
+                                </step>
+                                <step>
+                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                                    <params>1d</params>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -190,15 +278,21 @@ return JSON.stringify(lld);</params>
                                 <step>
                                     <type>JAVASCRIPT</type>
                                     <params>var match = /^(\d+)\.\d+-\d+$/gi.exec(value);
-var year = match[1].substring(0,4);
-var monthIndex = match[1].substring(4,6)-1;
-var day = match[1].substring(6,8);
-var hours = match[1].substring(8,10);
-var minutes = match[1].substring(10,12);
-var seconds = match[1].substring(12,14);
+var ts = new Date();
 
-var ts = new Date(year, monthIndex, day, hours, minutes, seconds).valueOf() / 1000;
-return ts;</params>
+ts.setUTCFullYear(match[1].substring(0,4));
+ts.setUTCMonth(match[1].substring(4,6)-1);
+ts.setUTCDate(match[1].substring(6,8));
+ts.setUTCHours(match[1].substring(8,10));
+ts.setUTCMinutes(match[1].substring(10,12));
+ts.setUTCSeconds(match[1].substring(12,14));
+ts.setUTCMilliseconds(0);
+
+return ts.valueOf() / 1000;</params>
+                                </step>
+                                <step>
+                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                                    <params>1d</params>
                                 </step>
                             </preprocessing>
                         </item_prototype>
