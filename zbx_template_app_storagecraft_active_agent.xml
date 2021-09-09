@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-09-07T09:12:07Z</date>
+    <date>2021-09-09T22:40:18Z</date>
     <groups>
         <group>
             <name>Templates/Futur-Tech/Applications</name>
@@ -43,30 +43,40 @@
                     </applications>
                     <triggers>
                         <trigger>
-                            <expression>{logseverity()}=9</expression>
+                            <expression>{regexp(Backup \&quot;[^\&quot;]+\&quot; on,#1)}=0 and {logseverity()}=9</expression>
                             <recovery_mode>NONE</recovery_mode>
-                            <name>Critical Error detected in ShadowProtectSPX event log</name>
-                            <opdata>{{ITEM.VALUE}.regsub(&quot;(.*)&quot;, \1)}</opdata>
+                            <name>Critical Error in ShadowProtectSPX Event Log</name>
+                            <opdata>{{ITEM.VALUE}.regsub(&quot;([\s\S]*)&quot;, \1)}</opdata>
                             <priority>HIGH</priority>
                             <description>This trigger need to be manually closed.</description>
                             <type>MULTIPLE</type>
                             <manual_close>YES</manual_close>
                         </trigger>
                         <trigger>
-                            <expression>{logseverity()}=4</expression>
+                            <expression>{regexp(Backup \&quot;[^\&quot;]+\&quot; on,#1)}=0 and {logseverity()}=4</expression>
                             <recovery_mode>NONE</recovery_mode>
-                            <name>Error detected in ShadowProtectSPX event log</name>
-                            <opdata>{{ITEM.VALUE}.regsub(&quot;(.*)&quot;, \1)}</opdata>
+                            <name>Error in ShadowProtectSPX Event Log</name>
+                            <opdata>{{ITEM.VALUE}.regsub(&quot;([\s\S]*)&quot;, \1)}</opdata>
                             <priority>AVERAGE</priority>
                             <description>This trigger need to be manually closed.</description>
                             <type>MULTIPLE</type>
                             <manual_close>YES</manual_close>
                         </trigger>
                         <trigger>
-                            <expression>{logseverity()}=2</expression>
+                            <expression>{regexp(Backup \&quot;[^\&quot;]+\&quot; on,#1)}=0 and {logseverity()}=1</expression>
                             <recovery_mode>NONE</recovery_mode>
-                            <name>Warning detected in ShadowProtectSPX event log</name>
-                            <opdata>{{ITEM.VALUE}.regsub(&quot;(.*)&quot;, \1)}</opdata>
+                            <name>Information in ShadowProtectSPX Event Log</name>
+                            <opdata>{{ITEM.VALUE}.regsub(&quot;([\s\S]*)&quot;, \1)}</opdata>
+                            <priority>INFO</priority>
+                            <description>This trigger need to be manually closed.</description>
+                            <type>MULTIPLE</type>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                        <trigger>
+                            <expression>{regexp(Backup \&quot;[^\&quot;]+\&quot; on,#1)}=0 and {logseverity()}=2</expression>
+                            <recovery_mode>NONE</recovery_mode>
+                            <name>Warning in ShadowProtectSPX Event Log</name>
+                            <opdata>{{ITEM.VALUE}.regsub(&quot;([\s\S]*)&quot;, \1)}</opdata>
                             <priority>WARNING</priority>
                             <description>This trigger need to be manually closed.</description>
                             <type>MULTIPLE</type>
@@ -88,30 +98,40 @@
                     </applications>
                     <triggers>
                         <trigger>
-                            <expression>{logseverity()}=9</expression>
+                            <expression>{regexp(\\.+\\.+\\,#1)}=0 and {logseverity()}=9</expression>
                             <recovery_mode>NONE</recovery_mode>
-                            <name>Critical Error detected in ImageManager event log</name>
-                            <opdata>{{ITEM.VALUE}.regsub(&quot;(.*)&quot;, \1)}</opdata>
+                            <name>Critical Error in ImageManager Event Log</name>
+                            <opdata>{{ITEM.VALUE}.regsub(&quot;([\s\S]*)&quot;, \1)}</opdata>
                             <priority>HIGH</priority>
                             <description>This trigger need to be manually closed.</description>
                             <type>MULTIPLE</type>
                             <manual_close>YES</manual_close>
                         </trigger>
                         <trigger>
-                            <expression>{logseverity()}=4</expression>
+                            <expression>{regexp(\\.+\\.+\\,#1)}=0 and {logseverity()}=4</expression>
                             <recovery_mode>NONE</recovery_mode>
-                            <name>Error detected in ImageManager event log</name>
-                            <opdata>{{ITEM.VALUE}.regsub(&quot;(.*)&quot;, \1)}</opdata>
+                            <name>Error in ImageManager Event Log</name>
+                            <opdata>{{ITEM.VALUE}.regsub(&quot;([\s\S]*)&quot;, \1)}</opdata>
                             <priority>AVERAGE</priority>
                             <description>This trigger need to be manually closed.</description>
                             <type>MULTIPLE</type>
                             <manual_close>YES</manual_close>
                         </trigger>
                         <trigger>
-                            <expression>{logseverity()}=2</expression>
+                            <expression>{regexp(\\.+\\.+\\,#1)}=0 and {logseverity()}=1</expression>
                             <recovery_mode>NONE</recovery_mode>
-                            <name>Warning detected in ImageManager event log</name>
-                            <opdata>{{ITEM.VALUE}.regsub(&quot;(.*)&quot;, \1)}</opdata>
+                            <name>Information in ImageManager Event Log</name>
+                            <opdata>{{ITEM.VALUE}.regsub(&quot;([\s\S]*)&quot;, \1)}</opdata>
+                            <priority>INFO</priority>
+                            <description>This trigger need to be manually closed.</description>
+                            <type>MULTIPLE</type>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                        <trigger>
+                            <expression>{regexp(\\.+\\.+\\,#1)}=0 and {logseverity()}=2</expression>
+                            <recovery_mode>NONE</recovery_mode>
+                            <name>Warning in ImageManager Event Log</name>
+                            <opdata>{{ITEM.VALUE}.regsub(&quot;([\s\S]*)&quot;, \1)}</opdata>
                             <priority>WARNING</priority>
                             <description>This trigger need to be manually closed.</description>
                             <type>MULTIPLE</type>
@@ -128,7 +148,7 @@
                     <delay>0</delay>
                     <item_prototypes>
                         <item_prototype>
-                            <name>{#MACHINE_UPPER} [{#VOL}] Collapse Log</name>
+                            <name>{#MACHINE_UPPER} Collapse [{#VOL}] Log</name>
                             <type>ZABBIX_ACTIVE</type>
                             <key>eventlog[Application,&quot;[\s\S]*{#SITECODE}[\s\S]*{#MACHINE}[\s\S]*{#VOL}[\s\S]*&quot;,,StorageCraft ImageManager,,,skip]</key>
                             <delay>15m</delay>
@@ -143,7 +163,7 @@
                             </applications>
                         </item_prototype>
                         <item_prototype>
-                            <name>{#MACHINE_UPPER} [{#VOL}] Collapse Age</name>
+                            <name>{#MACHINE_UPPER} Collapse [{#VOL}] Age</name>
                             <type>CALCULATED</type>
                             <key>imagemanager.collapse.age[{#MACHINE},{#VOL}]</key>
                             <delay>15m</delay>
@@ -163,23 +183,23 @@
                                     <name>No ImageManager Collapse of {#MACHINE_UPPER} [{#VOL}] for more than 36h</name>
                                     <opdata>Last collapse: {ITEM.LASTVALUE1}</opdata>
                                     <priority>WARNING</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>No ImageManager Collapse of {#MACHINE_UPPER} [{#VOL}] for more than 72h</name>
+                                            <expression>{Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].last()}&gt;259200</expression>
+                                        </dependency>
+                                    </dependencies>
                                 </trigger_prototype>
                                 <trigger_prototype>
                                     <expression>{last()}&gt;259200</expression>
                                     <name>No ImageManager Collapse of {#MACHINE_UPPER} [{#VOL}] for more than 72h</name>
                                     <opdata>Last collapse: {ITEM.LASTVALUE1}</opdata>
                                     <priority>HIGH</priority>
-                                    <dependencies>
-                                        <dependency>
-                                            <name>No ImageManager Collapse of {#MACHINE_UPPER} [{#VOL}] for more than 36h</name>
-                                            <expression>{Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].last()}&gt;129600</expression>
-                                        </dependency>
-                                    </dependencies>
                                 </trigger_prototype>
                             </trigger_prototypes>
                         </item_prototype>
                         <item_prototype>
-                            <name>{#MACHINE_UPPER} [{#VOL}] Collapse Success</name>
+                            <name>{#MACHINE_UPPER} Collapse [{#VOL}] Success</name>
                             <type>ZABBIX_ACTIVE</type>
                             <key>wmi.get[root\cimv2,SELECT TimeGenerated FROM Win32_NTLogEvent WHERE (logfile='Application') AND (SourceName='StorageCraft ImageManager') AND (EventCode=1120) AND (Message LIKE '%\\{#SITECODE}%\\{#MACHINE}%\\{#VOL}%.spi')]</key>
                             <delay>15m</delay>
@@ -212,6 +232,64 @@ return ts.valueOf() / 1000;</params>
                             </preprocessing>
                         </item_prototype>
                     </item_prototypes>
+                    <trigger_prototypes>
+                        <trigger_prototype>
+                            <expression>{Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].regexp(\\{#SITECODE}\\{#MACHINE}\\,#1)}=1&#13;
+and &#13;
+    ({Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].regexp({#VOL}-.+\.spi,#1)}=1 &#13;
+    or&#13;
+    {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].regexp(_VOL-b\d+-.+\.spi,#1)}=0) &#13;
+and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].last()}&gt;0&#13;
+and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logseverity()}=9</expression>
+                            <recovery_mode>NONE</recovery_mode>
+                            <name>Critical Error in ImageManager Event Log for {#MACHINE_UPPER} [{#VOL}]</name>
+                            <opdata>{{ITEM.VALUE}.regsub(&quot;([\s\S]*)&quot;, \1)}</opdata>
+                            <priority>HIGH</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                            <expression>{Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].regexp(\\{#SITECODE}\\{#MACHINE}\\,#1)}=1&#13;
+and &#13;
+    ({Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].regexp({#VOL}-.+\.spi,#1)}=1 &#13;
+    or&#13;
+    {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].regexp(_VOL-b\d+-.+\.spi,#1)}=0) &#13;
+and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].last()}&gt;0&#13;
+and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logseverity()}=4</expression>
+                            <recovery_mode>NONE</recovery_mode>
+                            <name>Error in ImageManager Event Log for {#MACHINE_UPPER} [{#VOL}]</name>
+                            <opdata>{{ITEM.VALUE}.regsub(&quot;([\s\S]*)&quot;, \1)}</opdata>
+                            <priority>AVERAGE</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                            <expression>{Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].regexp(\\{#SITECODE}\\{#MACHINE}\\,#1)}=1&#13;
+and &#13;
+    ({Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].regexp({#VOL}-.+\.spi,#1)}=1 &#13;
+    or&#13;
+    {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].regexp(_VOL-b\d+-.+\.spi,#1)}=0) &#13;
+and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].last()}&gt;0&#13;
+and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logseverity()}=1</expression>
+                            <recovery_mode>NONE</recovery_mode>
+                            <name>Information in ImageManager Event Log for {#MACHINE_UPPER} [{#VOL}]</name>
+                            <opdata>{{ITEM.VALUE}.regsub(&quot;([\s\S]*)&quot;, \1)}</opdata>
+                            <priority>INFO</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                            <expression>{Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].regexp(\\{#SITECODE}\\{#MACHINE}\\,#1)}=1&#13;
+and &#13;
+    ({Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].regexp({#VOL}-.+\.spi,#1)}=1 &#13;
+    or&#13;
+    {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].regexp(_VOL-b\d+-.+\.spi,#1)}=0) &#13;
+and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].last()}&gt;0&#13;
+and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logseverity()}=2</expression>
+                            <recovery_mode>NONE</recovery_mode>
+                            <name>Warning in ImageManager Event Log for {#MACHINE_UPPER} [{#VOL}]</name>
+                            <opdata>{{ITEM.VALUE}.regsub(&quot;([\s\S]*)&quot;, \1)}</opdata>
+                            <priority>WARNING</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                    </trigger_prototypes>
                     <master_item>
                         <key>eventlog[Application,,,StorageCraft ImageManager,,,skip]</key>
                     </master_item>
@@ -248,9 +326,9 @@ return JSON.stringify(lld);</params>
                     <delay>0</delay>
                     <item_prototypes>
                         <item_prototype>
-                            <name>{#MACHINE_UPPER} [{#TASK}] Backup Age</name>
+                            <name>{#MACHINE_UPPER} Backup [{#TASK}] Age</name>
                             <type>CALCULATED</type>
-                            <key>shadowprotectspx.backup.age[{#MACHINE_UPPER},{#TASK}]</key>
+                            <key>shadowprotectspx.backup.age[{#MACHINE},{#TASK}]</key>
                             <delay>15m</delay>
                             <units>uptime</units>
                             <params>now(&quot;wmi.get[root\cimv2,SELECT TimeGenerated FROM Win32_NTLogEvent WHERE (logfile='Application') AND (SourceName='ShadowProtectSPX') AND (EventCode=3) AND (Message LIKE '%Backup \&quot;{#TASK}\&quot; on {#MACHINE} successfully finished backing up%')]&quot;)-last(&quot;wmi.get[root\cimv2,SELECT TimeGenerated FROM Win32_NTLogEvent WHERE (logfile='Application') AND (SourceName='ShadowProtectSPX') AND (EventCode=3) AND (Message LIKE '%Backup \&quot;{#TASK}\&quot; on {#MACHINE} successfully finished backing up%')]&quot;)</params>
@@ -262,9 +340,29 @@ return JSON.stringify(lld);</params>
                                     <name>StorageCraft ShadowProtectSPX</name>
                                 </application>
                             </applications>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}&gt;129600</expression>
+                                    <name>No ShadowProtectSPX Backup of {#MACHINE_UPPER} [{#TASK}] for more than 36h</name>
+                                    <opdata>Last backup: {ITEM.LASTVALUE1}</opdata>
+                                    <priority>WARNING</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>No ShadowProtectSPX Backup of {#MACHINE_UPPER} [{#TASK}] for more than 72h</name>
+                                            <expression>{Template Futur-Tech App StorageCraft:shadowprotectspx.backup.age[{#MACHINE},{#TASK}].last()}&gt;259200</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}&gt;259200</expression>
+                                    <name>No ShadowProtectSPX Backup of {#MACHINE_UPPER} [{#TASK}] for more than 72h</name>
+                                    <opdata>Last backup: {ITEM.LASTVALUE1}</opdata>
+                                    <priority>HIGH</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
                         </item_prototype>
                         <item_prototype>
-                            <name>{#MACHINE_UPPER} [{#TASK}] Backup Success</name>
+                            <name>{#MACHINE_UPPER} Backup [{#TASK}] Success</name>
                             <type>ZABBIX_ACTIVE</type>
                             <key>wmi.get[root\cimv2,SELECT TimeGenerated FROM Win32_NTLogEvent WHERE (logfile='Application') AND (SourceName='ShadowProtectSPX') AND (EventCode=3) AND (Message LIKE '%Backup &quot;{#TASK}&quot; on {#MACHINE} successfully finished backing up%')]</key>
                             <delay>15m</delay>
@@ -297,6 +395,48 @@ return ts.valueOf() / 1000;</params>
                             </preprocessing>
                         </item_prototype>
                     </item_prototypes>
+                    <trigger_prototypes>
+                        <trigger_prototype>
+                            <expression>{Template Futur-Tech App StorageCraft:eventlog[Application,,,ShadowProtectSPX,,,skip].regexp(Backup \&quot;{#TASK}\&quot; on {#MACHINE},#1)}=1&#13;
+and {Template Futur-Tech App StorageCraft:shadowprotectspx.backup.age[{#MACHINE},{#TASK}].last()}&gt;0&#13;
+and {Template Futur-Tech App StorageCraft:eventlog[Application,,,ShadowProtectSPX,,,skip].logseverity()}=9</expression>
+                            <recovery_mode>NONE</recovery_mode>
+                            <name>Critical Error in ShadowProtectSPX Event Log for {#MACHINE_UPPER} [{#TASK}]</name>
+                            <opdata>{{ITEM.VALUE}.regsub(&quot;([\s\S]*)&quot;, \1)}</opdata>
+                            <priority>HIGH</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                            <expression>{Template Futur-Tech App StorageCraft:eventlog[Application,,,ShadowProtectSPX,,,skip].regexp(Backup \&quot;{#TASK}\&quot; on {#MACHINE},#1)}=1&#13;
+and {Template Futur-Tech App StorageCraft:shadowprotectspx.backup.age[{#MACHINE},{#TASK}].last()}&gt;0&#13;
+and {Template Futur-Tech App StorageCraft:eventlog[Application,,,ShadowProtectSPX,,,skip].logseverity()}=4</expression>
+                            <recovery_mode>NONE</recovery_mode>
+                            <name>Error in ShadowProtectSPX Event Log for {#MACHINE_UPPER} [{#TASK}]</name>
+                            <opdata>{{ITEM.VALUE}.regsub(&quot;([\s\S]*)&quot;, \1)}</opdata>
+                            <priority>AVERAGE</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                            <expression>{Template Futur-Tech App StorageCraft:eventlog[Application,,,ShadowProtectSPX,,,skip].regexp(Backup \&quot;{#TASK}\&quot; on {#MACHINE},#1)}=1&#13;
+and {Template Futur-Tech App StorageCraft:shadowprotectspx.backup.age[{#MACHINE},{#TASK}].last()}&gt;0&#13;
+and {Template Futur-Tech App StorageCraft:eventlog[Application,,,ShadowProtectSPX,,,skip].logseverity()}=1</expression>
+                            <recovery_mode>NONE</recovery_mode>
+                            <name>Information in ShadowProtectSPX Event Log for {#MACHINE_UPPER} [{#TASK}]</name>
+                            <opdata>{{ITEM.VALUE}.regsub(&quot;([\s\S]*)&quot;, \1)}</opdata>
+                            <priority>INFO</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                            <expression>{Template Futur-Tech App StorageCraft:eventlog[Application,,,ShadowProtectSPX,,,skip].regexp(Backup \&quot;{#TASK}\&quot; on {#MACHINE},#1)}=1&#13;
+and {Template Futur-Tech App StorageCraft:shadowprotectspx.backup.age[{#MACHINE},{#TASK}].last()}&gt;0&#13;
+and {Template Futur-Tech App StorageCraft:eventlog[Application,,,ShadowProtectSPX,,,skip].logseverity()}=2</expression>
+                            <recovery_mode>NONE</recovery_mode>
+                            <name>Warning in ShadowProtectSPX Event Log for {#MACHINE_UPPER} [{#TASK}]</name>
+                            <opdata>{{ITEM.VALUE}.regsub(&quot;([\s\S]*)&quot;, \1)}</opdata>
+                            <priority>WARNING</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                    </trigger_prototypes>
                     <master_item>
                         <key>eventlog[Application,,,ShadowProtectSPX,,,skip]</key>
                     </master_item>
