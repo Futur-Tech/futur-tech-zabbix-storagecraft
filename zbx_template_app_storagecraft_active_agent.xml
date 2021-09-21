@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-09-21T08:37:54Z</date>
+    <date>2021-09-21T10:14:40Z</date>
     <groups>
         <group>
             <name>Templates/Futur-Tech/Applications</name>
@@ -295,6 +295,14 @@ and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{
                             <name>No CHKDSK for {#MACHINE_UPPER} [{#VOL}] Collapse in last {$STORAGECRAFT.COLLAPSE.CHKDSK.CRIT}</name>
                             <opdata>Log: {{ITEM.VALUE}.regsub(&quot;(.*)&quot;, \1)}</opdata>
                             <priority>AVERAGE</priority>
+                            <dependencies>
+                                <dependency>
+                                    <name>CHKDSK Error for {#MACHINE_UPPER} [{#VOL}] Collapse</name>
+                                    <expression>{Template Futur-Tech App StorageCraft:logrt[&quot;C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$&quot;,&quot;Chkdsk.+ {#VOL}[-\w]+\.spi&quot;,,,skip].regexp(&quot;Chkdsk verify failed: {#VOL}[-\w]+\.spi&quot;,#1)}=1&#13;
+and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].now()}&gt;0</expression>
+                                    <recovery_expression>{Template Futur-Tech App StorageCraft:logrt[&quot;C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$&quot;,&quot;Chkdsk.+ {#VOL}[-\w]+\.spi&quot;,,,skip].regexp(&quot;Chkdsk verify succeeded: {#VOL}[-\w]+\.spi \(No errors were found\)&quot;,#1)}=1</recovery_expression>
+                                </dependency>
+                            </dependencies>
                         </trigger_prototype>
                         <trigger_prototype>
                             <expression>{Template Futur-Tech App StorageCraft:logrt[&quot;C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$&quot;,&quot;Chkdsk.+ {#VOL}[-\w]+\.spi&quot;,,,skip].regexp(&quot;Chkdsk verify succeeded: {#VOL}[-\w]+\.spi \(No errors were found\)&quot;,{$STORAGECRAFT.COLLAPSE.CHKDSK.INFO})}=1 and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].now()}&gt;0</expression>
