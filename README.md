@@ -1,6 +1,10 @@
 # Zabbix Monitoring for StorageCraft ShadowProtectSPX and ImageManager
 Template Zabbix to monitor StorageCraft ShadowProtectSPX and ImageManager
 
+This template will automatically monitor your Backup tasks and ImanageManager consolidations tasks. It includes also triggers if advanced verification of collapse is late or failed.
+
+To integrate in your Zabbix Dashboard, create a *widget* **Data overview** and use the *Application* **StorageCraft Dashboard** with *Host location* on **Top**.
+
 Works for Zabbix 5.x Active Agent
 
 ## Discovery of ShadowProtectSPX Backup Task
