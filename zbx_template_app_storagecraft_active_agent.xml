@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-09-21T10:14:40Z</date>
+    <date>2021-10-15T20:18:41Z</date>
     <groups>
         <group>
             <name>Templates/Futur-Tech/Applications</name>
@@ -199,6 +199,20 @@
                             </applications>
                         </item_prototype>
                         <item_prototype>
+                            <name>{#MACHINE_UPPER} VirtualBoot [{#VOL}] Log</name>
+                            <type>ZABBIX_ACTIVE</type>
+                            <key>logrt[&quot;C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$&quot;,&quot;{#VOL}[-\w]+_VirtualBoot_VM| screenshot| VM|_VM_|vboxmanage|[Vv]irtual[ ]*[Bb]o|Hyper-V|^Generated (disks|incremental images)&quot;,,,skip]</key>
+                            <delay>15m</delay>
+                            <trends>0</trends>
+                            <value_type>LOG</value_type>
+                            <description>Note that some lines might be missing from this log. Use the original log file located in C:\Program Files (x86)\StorageCraft\ImageManager\Logs\ for debugging.</description>
+                            <applications>
+                                <application>
+                                    <name>StorageCraft ImageManager</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                        <item_prototype>
                             <name>{#MACHINE_UPPER} Collapse [{#VOL}] Success</name>
                             <type>ZABBIX_ACTIVE</type>
                             <key>wmi.get[root\cimv2,SELECT TimeGenerated FROM Win32_NTLogEvent WHERE (logfile='Application') AND (SourceName='StorageCraft ImageManager') AND (EventCode=1120) AND (Message LIKE '{#PATH_ESC}\\{#VOL}%.spi')]</key>
@@ -257,6 +271,7 @@ and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft Im
                             <name>Critical Error in ImageManager Event Log for {#MACHINE_UPPER} [{#VOL}]</name>
                             <opdata>Last collapse age: {ITEM.LASTVALUE4}, ImageManager Log: {ITEM.VALUE1}</opdata>
                             <priority>HIGH</priority>
+                            <manual_close>YES</manual_close>
                         </trigger_prototype>
                         <trigger_prototype>
                             <expression>{Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].regexp({#PATH_ESC},#1)}=1&#13;
@@ -273,6 +288,7 @@ and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft Im
                             <name>Error in ImageManager Event Log for {#MACHINE_UPPER} [{#VOL}]</name>
                             <opdata>Last collapse age: {ITEM.LASTVALUE4}, ImageManager Log: {ITEM.VALUE1}</opdata>
                             <priority>AVERAGE</priority>
+                            <manual_close>YES</manual_close>
                             <dependencies>
                                 <dependency>
                                     <name>Critical Error in ImageManager Event Log for {#MACHINE_UPPER} [{#VOL}]</name>
@@ -305,10 +321,40 @@ and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{
                             </dependencies>
                         </trigger_prototype>
                         <trigger_prototype>
+                            <expression>{Template Futur-Tech App StorageCraft:logrt[&quot;C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$&quot;,&quot;{#VOL}[-\w]+_VirtualBoot_VM| screenshot| VM|_VM_|vboxmanage|[Vv]irtual[ ]*[Bb]o|Hyper-V|^Generated (disks|incremental images)&quot;,,,skip].regexp(^Took screenshot ,{$STORAGECRAFT.COLLAPSE.VIRTUALBOOT.CRIT})}=0 &#13;
+and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].now()}&gt;0&#13;
+and {$STORAGECRAFT.COLLAPSE.VIRTUALBOOT:&quot;{#MACHINE_UPPER}&quot;}=1</expression>
+                            <name>No VirtualBoot for {#MACHINE_UPPER} [{#VOL}] Collapse in last {$STORAGECRAFT.COLLAPSE.VIRTUALBOOT.CRIT}</name>
+                            <opdata>Log: {{ITEM.LASTVALUE1}.regsub(&quot;(.*)&quot;, \1)}</opdata>
+                            <priority>AVERAGE</priority>
+                            <dependencies>
+                                <dependency>
+                                    <name>VirtualBoot Error for {#MACHINE_UPPER} [{#VOL}] Collapse</name>
+                                    <expression>{Template Futur-Tech App StorageCraft:logrt[&quot;C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$&quot;,&quot;{#VOL}[-\w]+_VirtualBoot_VM| screenshot| VM|_VM_|vboxmanage|[Vv]irtual[ ]*[Bb]o|Hyper-V|^Generated (disks|incremental images)&quot;,,,skip].regexp(virtual boot exception: {#VOL}[-\w]+\.spi,#1)}=1 and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].now()}&gt;0</expression>
+                                    <recovery_expression>{Template Futur-Tech App StorageCraft:logrt[&quot;C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$&quot;,&quot;{#VOL}[-\w]+_VirtualBoot_VM| screenshot| VM|_VM_|vboxmanage|[Vv]irtual[ ]*[Bb]o|Hyper-V|^Generated (disks|incremental images)&quot;,,,skip].regexp(^Took screenshot,#1)}=1</recovery_expression>
+                                </dependency>
+                            </dependencies>
+                        </trigger_prototype>
+                        <trigger_prototype>
                             <expression>{Template Futur-Tech App StorageCraft:logrt[&quot;C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$&quot;,&quot;Chkdsk.+ {#VOL}[-\w]+\.spi&quot;,,,skip].regexp(&quot;Chkdsk verify succeeded: {#VOL}[-\w]+\.spi \(No errors were found\)&quot;,{$STORAGECRAFT.COLLAPSE.CHKDSK.INFO})}=1 and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].now()}&gt;0</expression>
                             <name>Succeeded CHKDSK for {#MACHINE_UPPER} [{#VOL}] Collapse in last {$STORAGECRAFT.COLLAPSE.CHKDSK.INFO}</name>
                             <opdata>Log: {ITEM.LASTVALUE1}</opdata>
                             <priority>INFO</priority>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                            <expression>{Template Futur-Tech App StorageCraft:logrt[&quot;C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$&quot;,&quot;{#VOL}[-\w]+_VirtualBoot_VM| screenshot| VM|_VM_|vboxmanage|[Vv]irtual[ ]*[Bb]o|Hyper-V|^Generated (disks|incremental images)&quot;,,,skip].regexp(^Took screenshot ,{$STORAGECRAFT.COLLAPSE.VIRTUALBOOT.INFO})}=1 and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].now()}&gt;0</expression>
+                            <name>Succeeded VirtualBoot for {#MACHINE_UPPER} [{#VOL}] Collapse in last {$STORAGECRAFT.COLLAPSE.VIRTUALBOOT.INFO} (Verify screenshot sent by email))</name>
+                            <opdata>Log: {ITEM.LASTVALUE1}</opdata>
+                            <priority>INFO</priority>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                            <expression>{Template Futur-Tech App StorageCraft:logrt[&quot;C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$&quot;,&quot;{#VOL}[-\w]+_VirtualBoot_VM| screenshot| VM|_VM_|vboxmanage|[Vv]irtual[ ]*[Bb]o|Hyper-V|^Generated (disks|incremental images)&quot;,,,skip].regexp(virtual boot exception: {#VOL}[-\w]+\.spi,#1)}=1 and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].now()}&gt;0</expression>
+                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                            <recovery_expression>{Template Futur-Tech App StorageCraft:logrt[&quot;C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$&quot;,&quot;{#VOL}[-\w]+_VirtualBoot_VM| screenshot| VM|_VM_|vboxmanage|[Vv]irtual[ ]*[Bb]o|Hyper-V|^Generated (disks|incremental images)&quot;,,,skip].regexp(^Took screenshot,#1)}=1</recovery_expression>
+                            <name>VirtualBoot Error for {#MACHINE_UPPER} [{#VOL}] Collapse</name>
+                            <opdata>Log: {{ITEM.VALUE}.regsub(&quot;(.*)&quot;, \1)}</opdata>
+                            <priority>HIGH</priority>
+                            <description>VirtualBoot Error Codes: https://support.storagecraft.com/s/article/verify-backup-images?language=en_US#node_29604</description>
                         </trigger_prototype>
                         <trigger_prototype>
                             <expression>{Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].regexp({#PATH_ESC},#1)}=1&#13;
@@ -325,6 +371,7 @@ and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft Im
                             <name>Warning in ImageManager Event Log for {#MACHINE_UPPER} [{#VOL}]</name>
                             <opdata>Last collapse age: {ITEM.LASTVALUE4}, ImageManager Log: {ITEM.VALUE1}</opdata>
                             <priority>WARNING</priority>
+                            <manual_close>YES</manual_close>
                             <dependencies>
                                 <dependency>
                                     <name>Critical Error in ImageManager Event Log for {#MACHINE_UPPER} [{#VOL}]</name>
@@ -435,7 +482,7 @@ return JSON.stringify(lld);</params>
                             <name>{#MACHINE_UPPER} Backup [{#TASK}] Success</name>
                             <type>ZABBIX_ACTIVE</type>
                             <key>wmi.get[root\cimv2,SELECT TimeGenerated FROM Win32_NTLogEvent WHERE (logfile='Application') AND (SourceName='ShadowProtectSPX') AND (EventCode=3) AND (Message LIKE '%Backup &quot;{#TASK}&quot; on {#MACHINE} successfully finished backing up%')]</key>
-                            <delay>15m</delay>
+                            <delay>10m</delay>
                             <units>unixtime</units>
                             <applications>
                                 <application>
@@ -477,6 +524,7 @@ and {Template Futur-Tech App StorageCraft:eventlog[Application,,,ShadowProtectSP
                             <name>Critical Error in ShadowProtectSPX Event Log for {#MACHINE_UPPER} [{#TASK}]</name>
                             <opdata>Last backup age: {ITEM.LASTVALUE2} &amp; ShadowProtectSPX Log: {ITEM.VALUE1}</opdata>
                             <priority>HIGH</priority>
+                            <manual_close>YES</manual_close>
                         </trigger_prototype>
                         <trigger_prototype>
                             <expression>{Template Futur-Tech App StorageCraft:eventlog[Application,,,ShadowProtectSPX,,,skip].regexp(Backup \&quot;{#TASK}\&quot; on {#MACHINE},#1)}=1&#13;
@@ -489,6 +537,7 @@ and {Template Futur-Tech App StorageCraft:eventlog[Application,,,ShadowProtectSP
                             <name>Error in ShadowProtectSPX Event Log for {#MACHINE_UPPER} [{#TASK}]</name>
                             <opdata>Last backup age: {ITEM.LASTVALUE2} &amp; ShadowProtectSPX Log: {ITEM.VALUE1}</opdata>
                             <priority>AVERAGE</priority>
+                            <manual_close>YES</manual_close>
                             <dependencies>
                                 <dependency>
                                     <name>Critical Error in ShadowProtectSPX Event Log for {#MACHINE_UPPER} [{#TASK}]</name>
@@ -512,6 +561,7 @@ and {Template Futur-Tech App StorageCraft:eventlog[Application,,,ShadowProtectSP
                             <name>Warning in ShadowProtectSPX Event Log for {#MACHINE_UPPER} [{#TASK}]</name>
                             <opdata>Last backup age: {ITEM.LASTVALUE2} &amp; ShadowProtectSPX Log: {ITEM.VALUE1}</opdata>
                             <priority>WARNING</priority>
+                            <manual_close>YES</manual_close>
                             <dependencies>
                                 <dependency>
                                     <name>Critical Error in ShadowProtectSPX Event Log for {#MACHINE_UPPER} [{#TASK}]</name>
@@ -570,7 +620,7 @@ return JSON.stringify(lld);</params>
                 </macro>
                 <macro>
                     <macro>{$STORAGECRAFT.COLLAPSE.CHKDSK.CRIT}</macro>
-                    <value>8d</value>
+                    <value>10d</value>
                     <description>Max age for latest successful CHKDSK on Collapse</description>
                 </macro>
                 <macro>
@@ -582,6 +632,21 @@ return JSON.stringify(lld);</params>
                     <macro>{$STORAGECRAFT.COLLAPSE.CRIT}</macro>
                     <value>5d</value>
                     <description>Critical max age for latest successful Collapse</description>
+                </macro>
+                <macro>
+                    <macro>{$STORAGECRAFT.COLLAPSE.VIRTUALBOOT}</macro>
+                    <value>0</value>
+                    <description>By default, VirtualBoot check is not activated on ImageManager</description>
+                </macro>
+                <macro>
+                    <macro>{$STORAGECRAFT.COLLAPSE.VIRTUALBOOT.CRIT}</macro>
+                    <value>40d</value>
+                    <description>Max age for latest successful VirtualBoot on Collapse</description>
+                </macro>
+                <macro>
+                    <macro>{$STORAGECRAFT.COLLAPSE.VIRTUALBOOT.INFO}</macro>
+                    <value>1d</value>
+                    <description>Show info of successful VirtualBoot during this time</description>
                 </macro>
                 <macro>
                     <macro>{$STORAGECRAFT.COLLAPSE.WARN}</macro>
