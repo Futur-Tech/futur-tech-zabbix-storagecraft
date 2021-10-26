@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-10-15T20:18:41Z</date>
+    <date>2021-10-26T09:39:23Z</date>
     <groups>
         <group>
             <name>Templates/Futur-Tech/Applications</name>
@@ -254,7 +254,7 @@ and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{
                             <recovery_expression>{Template Futur-Tech App StorageCraft:logrt[&quot;C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$&quot;,&quot;Chkdsk.+ {#VOL}[-\w]+\.spi&quot;,,,skip].regexp(&quot;Chkdsk verify succeeded: {#VOL}[-\w]+\.spi \(No errors were found\)&quot;,#1)}=1</recovery_expression>
                             <name>CHKDSK Error for {#MACHINE_UPPER} [{#VOL}] Collapse</name>
                             <opdata>Log: {{ITEM.VALUE}.regsub(&quot;(.*)&quot;, \1)}</opdata>
-                            <priority>HIGH</priority>
+                            <priority>AVERAGE</priority>
                         </trigger_prototype>
                         <trigger_prototype>
                             <expression>{Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].regexp({#PATH_ESC},#1)}=1&#13;
@@ -328,6 +328,11 @@ and {$STORAGECRAFT.COLLAPSE.VIRTUALBOOT:&quot;{#MACHINE_UPPER}&quot;}=1</express
                             <opdata>Log: {{ITEM.LASTVALUE1}.regsub(&quot;(.*)&quot;, \1)}</opdata>
                             <priority>AVERAGE</priority>
                             <dependencies>
+                                <dependency>
+                                    <name>No CHKDSK for {#MACHINE_UPPER} [{#VOL}] Collapse in last {$STORAGECRAFT.COLLAPSE.CHKDSK.CRIT}</name>
+                                    <expression>{Template Futur-Tech App StorageCraft:logrt[&quot;C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$&quot;,&quot;Chkdsk.+ {#VOL}[-\w]+\.spi&quot;,,,skip].regexp(&quot;Chkdsk verify succeeded: {#VOL}[-\w]+\.spi \(No errors were found\)&quot;,{$STORAGECRAFT.COLLAPSE.CHKDSK.CRIT})}=0&#13;
+and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].now()}&gt;0</expression>
+                                </dependency>
                                 <dependency>
                                     <name>VirtualBoot Error for {#MACHINE_UPPER} [{#VOL}] Collapse</name>
                                     <expression>{Template Futur-Tech App StorageCraft:logrt[&quot;C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$&quot;,&quot;{#VOL}[-\w]+_VirtualBoot_VM| screenshot| VM|_VM_|vboxmanage|[Vv]irtual[ ]*[Bb]o|Hyper-V|^Generated (disks|incremental images)&quot;,,,skip].regexp(virtual boot exception: {#VOL}[-\w]+\.spi,#1)}=1 and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].now()}&gt;0</expression>
