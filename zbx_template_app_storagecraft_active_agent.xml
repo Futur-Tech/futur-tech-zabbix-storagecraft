@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-10-26T09:39:23Z</date>
+    <date>2021-11-20T14:35:56Z</date>
     <groups>
         <group>
             <name>Templates/Futur-Tech/Applications</name>
@@ -166,20 +166,26 @@
                             </applications>
                             <trigger_prototypes>
                                 <trigger_prototype>
-                                    <expression>{last()}&gt;{$STORAGECRAFT.COLLAPSE.CRIT:&quot;{#MACHINE}&quot;}</expression>
+                                    <expression>{last()}&gt;{$STORAGECRAFT.COLLAPSE.CRIT:&quot;{#MACHINE}&quot;}&#13;
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE} [{#VOL}]&quot;}=0 &#13;
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE}&quot;}=0</expression>
                                     <name>No ImageManager Collapse of {#MACHINE_UPPER} [{#VOL}] for more than {$STORAGECRAFT.COLLAPSE.CRIT:&quot;{#MACHINE}&quot;}</name>
                                     <opdata>Last collapse age: {ITEM.LASTVALUE1}</opdata>
                                     <priority>HIGH</priority>
                                 </trigger_prototype>
                                 <trigger_prototype>
-                                    <expression>{last()}&gt;{$STORAGECRAFT.COLLAPSE.WARN:&quot;{#MACHINE}&quot;}</expression>
+                                    <expression>{last()}&gt;{$STORAGECRAFT.COLLAPSE.WARN:&quot;{#MACHINE}&quot;}&#13;
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE} [{#VOL}]&quot;}=0 &#13;
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE}&quot;}=0</expression>
                                     <name>No ImageManager Collapse of {#MACHINE_UPPER} [{#VOL}] for more than {$STORAGECRAFT.COLLAPSE.WARN:&quot;{#MACHINE}&quot;}</name>
                                     <opdata>Last collapse age: {ITEM.LASTVALUE1}</opdata>
                                     <priority>WARNING</priority>
                                     <dependencies>
                                         <dependency>
                                             <name>No ImageManager Collapse of {#MACHINE_UPPER} [{#VOL}] for more than {$STORAGECRAFT.COLLAPSE.CRIT:&quot;{#MACHINE}&quot;}</name>
-                                            <expression>{Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].last()}&gt;{$STORAGECRAFT.COLLAPSE.CRIT:&quot;{#MACHINE}&quot;}</expression>
+                                            <expression>{Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].last()}&gt;{$STORAGECRAFT.COLLAPSE.CRIT:&quot;{#MACHINE}&quot;}&#13;
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE} [{#VOL}]&quot;}=0 &#13;
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE}&quot;}=0</expression>
                                         </dependency>
                                     </dependencies>
                                 </trigger_prototype>
@@ -249,9 +255,13 @@ return ts.valueOf() / 1000;</params>
                     <trigger_prototypes>
                         <trigger_prototype>
                             <expression>{Template Futur-Tech App StorageCraft:logrt[&quot;C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$&quot;,&quot;Chkdsk.+ {#VOL}[-\w]+\.spi&quot;,,,skip].regexp(&quot;Chkdsk verify failed: {#VOL}[-\w]+\.spi&quot;,#1)}=1&#13;
-and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].now()}&gt;0</expression>
+and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].now()}&gt;0&#13;
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE} [{#VOL}]&quot;}=0 &#13;
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE}&quot;}=0</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                            <recovery_expression>{Template Futur-Tech App StorageCraft:logrt[&quot;C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$&quot;,&quot;Chkdsk.+ {#VOL}[-\w]+\.spi&quot;,,,skip].regexp(&quot;Chkdsk verify succeeded: {#VOL}[-\w]+\.spi \(No errors were found\)&quot;,#1)}=1</recovery_expression>
+                            <recovery_expression>{Template Futur-Tech App StorageCraft:logrt[&quot;C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$&quot;,&quot;Chkdsk.+ {#VOL}[-\w]+\.spi&quot;,,,skip].regexp(&quot;Chkdsk verify succeeded: {#VOL}[-\w]+\.spi \(No errors were found\)&quot;,#1)}=1&#13;
+or ({$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE} [{#VOL}]&quot;}=1&#13;
+    or {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE}&quot;}=1)</recovery_expression>
                             <name>CHKDSK Error for {#MACHINE_UPPER} [{#VOL}] Collapse</name>
                             <opdata>Log: {{ITEM.VALUE}.regsub(&quot;(.*)&quot;, \1)}</opdata>
                             <priority>AVERAGE</priority>
@@ -263,11 +273,15 @@ and &#13;
     or&#13;
     {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].regexp(_VOL-b\d+-.+\.spi,#1)}=0) &#13;
 and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].last()}&gt;0&#13;
-and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logseverity()}=9</expression>
+and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logseverity()}=9&#13;
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE} [{#VOL}]&quot;}=0 &#13;
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE}&quot;}=0</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                             <recovery_expression>{Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].regexp({#PATH_ESC}\\{#VOL}-.+\.spi,#1)}=1&#13;
 and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logseverity()}=1&#13;
-and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logeventid(1120)}=1</recovery_expression>
+and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logeventid(1120)}=1&#13;
+or ({$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE} [{#VOL}]&quot;}=1&#13;
+    or {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE}&quot;}=1)</recovery_expression>
                             <name>Critical Error in ImageManager Event Log for {#MACHINE_UPPER} [{#VOL}]</name>
                             <opdata>Last collapse age: {ITEM.LASTVALUE4}, ImageManager Log: {ITEM.VALUE1}</opdata>
                             <priority>HIGH</priority>
@@ -280,11 +294,15 @@ and &#13;
     or&#13;
     {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].regexp(_VOL-b\d+-.+\.spi,#1)}=0) &#13;
 and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].last()}&gt;0&#13;
-and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logseverity()}=4</expression>
+and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logseverity()}=4&#13;
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE} [{#VOL}]&quot;}=0 &#13;
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE}&quot;}=0</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                             <recovery_expression>{Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].regexp({#PATH_ESC}\\{#VOL}-.+\.spi,#1)}=1&#13;
 and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logseverity()}=1&#13;
-and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logeventid(1120)}=1</recovery_expression>
+and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logeventid(1120)}=1&#13;
+or ({$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE} [{#VOL}]&quot;}=1&#13;
+    or {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE}&quot;}=1)</recovery_expression>
                             <name>Error in ImageManager Event Log for {#MACHINE_UPPER} [{#VOL}]</name>
                             <opdata>Last collapse age: {ITEM.LASTVALUE4}, ImageManager Log: {ITEM.VALUE1}</opdata>
                             <priority>AVERAGE</priority>
@@ -298,16 +316,23 @@ and &#13;
     or&#13;
     {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].regexp(_VOL-b\d+-.+\.spi,#1)}=0) &#13;
 and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].last()}&gt;0&#13;
-and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logseverity()}=9</expression>
+and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logseverity()}=9&#13;
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE} [{#VOL}]&quot;}=0 &#13;
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE}&quot;}=0</expression>
                                     <recovery_expression>{Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].regexp({#PATH_ESC}\\{#VOL}-.+\.spi,#1)}=1&#13;
 and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logseverity()}=1&#13;
-and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logeventid(1120)}=1</recovery_expression>
+and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logeventid(1120)}=1&#13;
+or ({$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE} [{#VOL}]&quot;}=1&#13;
+    or {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE}&quot;}=1)</recovery_expression>
                                 </dependency>
                             </dependencies>
                         </trigger_prototype>
                         <trigger_prototype>
                             <expression>{Template Futur-Tech App StorageCraft:logrt[&quot;C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$&quot;,&quot;Chkdsk.+ {#VOL}[-\w]+\.spi&quot;,,,skip].regexp(&quot;Chkdsk verify succeeded: {#VOL}[-\w]+\.spi \(No errors were found\)&quot;,{$STORAGECRAFT.COLLAPSE.CHKDSK.CRIT})}=0&#13;
-and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].now()}&gt;0</expression>
+and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].now()}&gt;0&#13;
+and {$STORAGECRAFT.COLLAPSE.CHKDSK:&quot;{#MACHINE_UPPER}&quot;}=1&#13;
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE} [{#VOL}]&quot;}=0 &#13;
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE}&quot;}=0</expression>
                             <name>No CHKDSK for {#MACHINE_UPPER} [{#VOL}] Collapse in last {$STORAGECRAFT.COLLAPSE.CHKDSK.CRIT}</name>
                             <opdata>Log: {{ITEM.VALUE}.regsub(&quot;(.*)&quot;, \1)}</opdata>
                             <priority>AVERAGE</priority>
@@ -315,15 +340,21 @@ and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{
                                 <dependency>
                                     <name>CHKDSK Error for {#MACHINE_UPPER} [{#VOL}] Collapse</name>
                                     <expression>{Template Futur-Tech App StorageCraft:logrt[&quot;C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$&quot;,&quot;Chkdsk.+ {#VOL}[-\w]+\.spi&quot;,,,skip].regexp(&quot;Chkdsk verify failed: {#VOL}[-\w]+\.spi&quot;,#1)}=1&#13;
-and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].now()}&gt;0</expression>
-                                    <recovery_expression>{Template Futur-Tech App StorageCraft:logrt[&quot;C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$&quot;,&quot;Chkdsk.+ {#VOL}[-\w]+\.spi&quot;,,,skip].regexp(&quot;Chkdsk verify succeeded: {#VOL}[-\w]+\.spi \(No errors were found\)&quot;,#1)}=1</recovery_expression>
+and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].now()}&gt;0&#13;
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE} [{#VOL}]&quot;}=0 &#13;
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE}&quot;}=0</expression>
+                                    <recovery_expression>{Template Futur-Tech App StorageCraft:logrt[&quot;C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$&quot;,&quot;Chkdsk.+ {#VOL}[-\w]+\.spi&quot;,,,skip].regexp(&quot;Chkdsk verify succeeded: {#VOL}[-\w]+\.spi \(No errors were found\)&quot;,#1)}=1&#13;
+or ({$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE} [{#VOL}]&quot;}=1&#13;
+    or {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE}&quot;}=1)</recovery_expression>
                                 </dependency>
                             </dependencies>
                         </trigger_prototype>
                         <trigger_prototype>
                             <expression>{Template Futur-Tech App StorageCraft:logrt[&quot;C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$&quot;,&quot;{#VOL}[-\w]+_VirtualBoot_VM| screenshot| VM|_VM_|vboxmanage|[Vv]irtual[ ]*[Bb]o|Hyper-V|^Generated (disks|incremental images)&quot;,,,skip].regexp(^Took screenshot ,{$STORAGECRAFT.COLLAPSE.VIRTUALBOOT.CRIT})}=0 &#13;
 and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].now()}&gt;0&#13;
-and {$STORAGECRAFT.COLLAPSE.VIRTUALBOOT:&quot;{#MACHINE_UPPER}&quot;}=1</expression>
+and {$STORAGECRAFT.COLLAPSE.VIRTUALBOOT:&quot;{#MACHINE_UPPER}&quot;}=1&#13;
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE} [{#VOL}]&quot;}=0 &#13;
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE}&quot;}=0</expression>
                             <name>No VirtualBoot for {#MACHINE_UPPER} [{#VOL}] Collapse in last {$STORAGECRAFT.COLLAPSE.VIRTUALBOOT.CRIT}</name>
                             <opdata>Log: {{ITEM.LASTVALUE1}.regsub(&quot;(.*)&quot;, \1)}</opdata>
                             <priority>AVERAGE</priority>
@@ -331,31 +362,46 @@ and {$STORAGECRAFT.COLLAPSE.VIRTUALBOOT:&quot;{#MACHINE_UPPER}&quot;}=1</express
                                 <dependency>
                                     <name>No CHKDSK for {#MACHINE_UPPER} [{#VOL}] Collapse in last {$STORAGECRAFT.COLLAPSE.CHKDSK.CRIT}</name>
                                     <expression>{Template Futur-Tech App StorageCraft:logrt[&quot;C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$&quot;,&quot;Chkdsk.+ {#VOL}[-\w]+\.spi&quot;,,,skip].regexp(&quot;Chkdsk verify succeeded: {#VOL}[-\w]+\.spi \(No errors were found\)&quot;,{$STORAGECRAFT.COLLAPSE.CHKDSK.CRIT})}=0&#13;
-and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].now()}&gt;0</expression>
+and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].now()}&gt;0&#13;
+and {$STORAGECRAFT.COLLAPSE.CHKDSK:&quot;{#MACHINE_UPPER}&quot;}=1&#13;
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE} [{#VOL}]&quot;}=0 &#13;
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE}&quot;}=0</expression>
                                 </dependency>
                                 <dependency>
                                     <name>VirtualBoot Error for {#MACHINE_UPPER} [{#VOL}] Collapse</name>
-                                    <expression>{Template Futur-Tech App StorageCraft:logrt[&quot;C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$&quot;,&quot;{#VOL}[-\w]+_VirtualBoot_VM| screenshot| VM|_VM_|vboxmanage|[Vv]irtual[ ]*[Bb]o|Hyper-V|^Generated (disks|incremental images)&quot;,,,skip].regexp(virtual boot exception: {#VOL}[-\w]+\.spi,#1)}=1 and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].now()}&gt;0</expression>
-                                    <recovery_expression>{Template Futur-Tech App StorageCraft:logrt[&quot;C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$&quot;,&quot;{#VOL}[-\w]+_VirtualBoot_VM| screenshot| VM|_VM_|vboxmanage|[Vv]irtual[ ]*[Bb]o|Hyper-V|^Generated (disks|incremental images)&quot;,,,skip].regexp(^Took screenshot,#1)}=1</recovery_expression>
+                                    <expression>{Template Futur-Tech App StorageCraft:logrt[&quot;C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$&quot;,&quot;{#VOL}[-\w]+_VirtualBoot_VM| screenshot| VM|_VM_|vboxmanage|[Vv]irtual[ ]*[Bb]o|Hyper-V|^Generated (disks|incremental images)&quot;,,,skip].regexp(virtual boot exception: {#VOL}[-\w]+\.spi,#1)}=1 and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].now()}&gt;0&#13;
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE} [{#VOL}]&quot;}=0 &#13;
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE}&quot;}=0</expression>
+                                    <recovery_expression>{Template Futur-Tech App StorageCraft:logrt[&quot;C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$&quot;,&quot;{#VOL}[-\w]+_VirtualBoot_VM| screenshot| VM|_VM_|vboxmanage|[Vv]irtual[ ]*[Bb]o|Hyper-V|^Generated (disks|incremental images)&quot;,,,skip].regexp(^Took screenshot,#1)}=1&#13;
+or ({$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE} [{#VOL}]&quot;}=1&#13;
+    or {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE}&quot;}=1)</recovery_expression>
                                 </dependency>
                             </dependencies>
                         </trigger_prototype>
                         <trigger_prototype>
-                            <expression>{Template Futur-Tech App StorageCraft:logrt[&quot;C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$&quot;,&quot;Chkdsk.+ {#VOL}[-\w]+\.spi&quot;,,,skip].regexp(&quot;Chkdsk verify succeeded: {#VOL}[-\w]+\.spi \(No errors were found\)&quot;,{$STORAGECRAFT.COLLAPSE.CHKDSK.INFO})}=1 and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].now()}&gt;0</expression>
+                            <expression>{Template Futur-Tech App StorageCraft:logrt[&quot;C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$&quot;,&quot;Chkdsk.+ {#VOL}[-\w]+\.spi&quot;,,,skip].regexp(&quot;Chkdsk verify succeeded: {#VOL}[-\w]+\.spi \(No errors were found\)&quot;,{$STORAGECRAFT.COLLAPSE.CHKDSK.INFO})}=1 and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].now()}&gt;0&#13;
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE} [{#VOL}]&quot;}=0 &#13;
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE}&quot;}=0</expression>
                             <name>Succeeded CHKDSK for {#MACHINE_UPPER} [{#VOL}] Collapse in last {$STORAGECRAFT.COLLAPSE.CHKDSK.INFO}</name>
                             <opdata>Log: {ITEM.LASTVALUE1}</opdata>
                             <priority>INFO</priority>
                         </trigger_prototype>
                         <trigger_prototype>
-                            <expression>{Template Futur-Tech App StorageCraft:logrt[&quot;C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$&quot;,&quot;{#VOL}[-\w]+_VirtualBoot_VM| screenshot| VM|_VM_|vboxmanage|[Vv]irtual[ ]*[Bb]o|Hyper-V|^Generated (disks|incremental images)&quot;,,,skip].regexp(^Took screenshot ,{$STORAGECRAFT.COLLAPSE.VIRTUALBOOT.INFO})}=1 and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].now()}&gt;0</expression>
+                            <expression>{Template Futur-Tech App StorageCraft:logrt[&quot;C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$&quot;,&quot;{#VOL}[-\w]+_VirtualBoot_VM| screenshot| VM|_VM_|vboxmanage|[Vv]irtual[ ]*[Bb]o|Hyper-V|^Generated (disks|incremental images)&quot;,,,skip].regexp(^Took screenshot ,{$STORAGECRAFT.COLLAPSE.VIRTUALBOOT.INFO})}=1 and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].now()}&gt;0&#13;
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE} [{#VOL}]&quot;}=0 &#13;
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE}&quot;}=0</expression>
                             <name>Succeeded VirtualBoot for {#MACHINE_UPPER} [{#VOL}] Collapse in last {$STORAGECRAFT.COLLAPSE.VIRTUALBOOT.INFO} (Verify screenshot sent by email))</name>
                             <opdata>Log: {ITEM.LASTVALUE1}</opdata>
                             <priority>INFO</priority>
                         </trigger_prototype>
                         <trigger_prototype>
-                            <expression>{Template Futur-Tech App StorageCraft:logrt[&quot;C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$&quot;,&quot;{#VOL}[-\w]+_VirtualBoot_VM| screenshot| VM|_VM_|vboxmanage|[Vv]irtual[ ]*[Bb]o|Hyper-V|^Generated (disks|incremental images)&quot;,,,skip].regexp(virtual boot exception: {#VOL}[-\w]+\.spi,#1)}=1 and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].now()}&gt;0</expression>
+                            <expression>{Template Futur-Tech App StorageCraft:logrt[&quot;C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$&quot;,&quot;{#VOL}[-\w]+_VirtualBoot_VM| screenshot| VM|_VM_|vboxmanage|[Vv]irtual[ ]*[Bb]o|Hyper-V|^Generated (disks|incremental images)&quot;,,,skip].regexp(virtual boot exception: {#VOL}[-\w]+\.spi,#1)}=1 and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].now()}&gt;0&#13;
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE} [{#VOL}]&quot;}=0 &#13;
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE}&quot;}=0</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                            <recovery_expression>{Template Futur-Tech App StorageCraft:logrt[&quot;C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$&quot;,&quot;{#VOL}[-\w]+_VirtualBoot_VM| screenshot| VM|_VM_|vboxmanage|[Vv]irtual[ ]*[Bb]o|Hyper-V|^Generated (disks|incremental images)&quot;,,,skip].regexp(^Took screenshot,#1)}=1</recovery_expression>
+                            <recovery_expression>{Template Futur-Tech App StorageCraft:logrt[&quot;C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$&quot;,&quot;{#VOL}[-\w]+_VirtualBoot_VM| screenshot| VM|_VM_|vboxmanage|[Vv]irtual[ ]*[Bb]o|Hyper-V|^Generated (disks|incremental images)&quot;,,,skip].regexp(^Took screenshot,#1)}=1&#13;
+or ({$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE} [{#VOL}]&quot;}=1&#13;
+    or {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE}&quot;}=1)</recovery_expression>
                             <name>VirtualBoot Error for {#MACHINE_UPPER} [{#VOL}] Collapse</name>
                             <opdata>Log: {{ITEM.VALUE}.regsub(&quot;(.*)&quot;, \1)}</opdata>
                             <priority>HIGH</priority>
@@ -368,11 +414,15 @@ and &#13;
     or&#13;
     {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].regexp(_VOL-b\d+-.+\.spi,#1)}=0) &#13;
 and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].last()}&gt;0&#13;
-and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logseverity()}=2</expression>
+and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logseverity()}=2&#13;
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE} [{#VOL}]&quot;}=0 &#13;
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE}&quot;}=0</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                             <recovery_expression>{Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].regexp({#PATH_ESC}\\{#VOL}-.+\.spi,#1)}=1&#13;
 and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logseverity()}=1&#13;
-and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logeventid(1120)}=1</recovery_expression>
+and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logeventid(1120)}=1&#13;
+or ({$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE} [{#VOL}]&quot;}=1&#13;
+    or {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE}&quot;}=1)</recovery_expression>
                             <name>Warning in ImageManager Event Log for {#MACHINE_UPPER} [{#VOL}]</name>
                             <opdata>Last collapse age: {ITEM.LASTVALUE4}, ImageManager Log: {ITEM.VALUE1}</opdata>
                             <priority>WARNING</priority>
@@ -386,10 +436,14 @@ and &#13;
     or&#13;
     {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].regexp(_VOL-b\d+-.+\.spi,#1)}=0) &#13;
 and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].last()}&gt;0&#13;
-and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logseverity()}=9</expression>
+and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logseverity()}=9&#13;
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE} [{#VOL}]&quot;}=0 &#13;
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE}&quot;}=0</expression>
                                     <recovery_expression>{Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].regexp({#PATH_ESC}\\{#VOL}-.+\.spi,#1)}=1&#13;
 and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logseverity()}=1&#13;
-and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logeventid(1120)}=1</recovery_expression>
+and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logeventid(1120)}=1&#13;
+or ({$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE} [{#VOL}]&quot;}=1&#13;
+    or {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE}&quot;}=1)</recovery_expression>
                                 </dependency>
                                 <dependency>
                                     <name>Error in ImageManager Event Log for {#MACHINE_UPPER} [{#VOL}]</name>
@@ -399,10 +453,14 @@ and &#13;
     or&#13;
     {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].regexp(_VOL-b\d+-.+\.spi,#1)}=0) &#13;
 and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].last()}&gt;0&#13;
-and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logseverity()}=4</expression>
+and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logseverity()}=4&#13;
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE} [{#VOL}]&quot;}=0 &#13;
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE}&quot;}=0</expression>
                                     <recovery_expression>{Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].regexp({#PATH_ESC}\\{#VOL}-.+\.spi,#1)}=1&#13;
 and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logseverity()}=1&#13;
-and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logeventid(1120)}=1</recovery_expression>
+and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logeventid(1120)}=1&#13;
+or ({$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE} [{#VOL}]&quot;}=1&#13;
+    or {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE}&quot;}=1)</recovery_expression>
                                 </dependency>
                             </dependencies>
                         </trigger_prototype>
@@ -624,6 +682,11 @@ return JSON.stringify(lld);</params>
                     <description>Warning max age for latest successful Backup</description>
                 </macro>
                 <macro>
+                    <macro>{$STORAGECRAFT.COLLAPSE.CHKDSK}</macro>
+                    <value>1</value>
+                    <description>By default, CheckDisk trigger is activated</description>
+                </macro>
+                <macro>
                     <macro>{$STORAGECRAFT.COLLAPSE.CHKDSK.CRIT}</macro>
                     <value>10d</value>
                     <description>Max age for latest successful CHKDSK on Collapse</description>
@@ -637,6 +700,21 @@ return JSON.stringify(lld);</params>
                     <macro>{$STORAGECRAFT.COLLAPSE.CRIT}</macro>
                     <value>5d</value>
                     <description>Critical max age for latest successful Collapse</description>
+                </macro>
+                <macro>
+                    <macro>{$STORAGECRAFT.COLLAPSE.IGNORE}</macro>
+                    <value>0</value>
+                    <description>By default, triggers for ImageManager are activated. Set to 1 for disable all the triggers.</description>
+                </macro>
+                <macro>
+                    <macro>{$STORAGECRAFT.COLLAPSE.IGNORE:&quot;DEVT-ST001 [C_VOL-b001]&quot;}</macro>
+                    <value>1</value>
+                    <description>Exemple of macro for disabling triggers for a specific chain of a machine.</description>
+                </macro>
+                <macro>
+                    <macro>{$STORAGECRAFT.COLLAPSE.IGNORE:&quot;DEVT-ST001&quot;}</macro>
+                    <value>1</value>
+                    <description>Exemple of macro for disabling triggers for all the chains of a machine.</description>
                 </macro>
                 <macro>
                     <macro>{$STORAGECRAFT.COLLAPSE.VIRTUALBOOT}</macro>
