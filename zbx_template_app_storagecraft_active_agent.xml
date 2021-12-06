@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-11-20T14:35:56Z</date>
+    <date>2021-12-06T22:51:11Z</date>
     <groups>
         <group>
             <name>Templates/Futur-Tech/Applications</name>
@@ -522,20 +522,20 @@ return JSON.stringify(lld);</params>
                             </applications>
                             <trigger_prototypes>
                                 <trigger_prototype>
-                                    <expression>{last()}&gt;{$STORAGECRAFT.COLLAPSE.CRIT:&quot;{#TASK}&quot;}</expression>
-                                    <name>No ShadowProtectSPX Backup of {#MACHINE_UPPER} [{#TASK}] for more than {$STORAGECRAFT.COLLAPSE.CRIT:&quot;{#TASK}&quot;}</name>
+                                    <expression>{last()}&gt;{$STORAGECRAFT.BACKUP.CRIT:&quot;{#TASK}&quot;}</expression>
+                                    <name>No ShadowProtectSPX Backup of {#MACHINE_UPPER} [{#TASK}] for more than {$STORAGECRAFT.BACKUP.CRIT:&quot;{#TASK}&quot;}</name>
                                     <opdata>Last backup age: {ITEM.LASTVALUE1}</opdata>
                                     <priority>HIGH</priority>
                                 </trigger_prototype>
                                 <trigger_prototype>
-                                    <expression>{last()}&gt;{$STORAGECRAFT.COLLAPSE.WARN:&quot;{#TASK}&quot;}</expression>
-                                    <name>No ShadowProtectSPX Backup of {#MACHINE_UPPER} [{#TASK}] for more than {$STORAGECRAFT.COLLAPSE.WARN:&quot;{#TASK}&quot;}</name>
+                                    <expression>{last()}&gt;{$STORAGECRAFT.BACKUP.WARN:&quot;{#TASK}&quot;}</expression>
+                                    <name>No ShadowProtectSPX Backup of {#MACHINE_UPPER} [{#TASK}] for more than {$STORAGECRAFT.BACKUP.WARN:&quot;{#TASK}&quot;}</name>
                                     <opdata>Last backup age: {ITEM.LASTVALUE1}</opdata>
                                     <priority>WARNING</priority>
                                     <dependencies>
                                         <dependency>
-                                            <name>No ShadowProtectSPX Backup of {#MACHINE_UPPER} [{#TASK}] for more than {$STORAGECRAFT.COLLAPSE.CRIT:&quot;{#TASK}&quot;}</name>
-                                            <expression>{Template Futur-Tech App StorageCraft:shadowprotectspx.backup.age[{#MACHINE},{#TASK}].last()}&gt;{$STORAGECRAFT.COLLAPSE.CRIT:&quot;{#TASK}&quot;}</expression>
+                                            <name>No ShadowProtectSPX Backup of {#MACHINE_UPPER} [{#TASK}] for more than {$STORAGECRAFT.BACKUP.CRIT:&quot;{#TASK}&quot;}</name>
+                                            <expression>{Template Futur-Tech App StorageCraft:shadowprotectspx.backup.age[{#MACHINE},{#TASK}].last()}&gt;{$STORAGECRAFT.BACKUP.CRIT:&quot;{#TASK}&quot;}</expression>
                                         </dependency>
                                     </dependencies>
                                 </trigger_prototype>
