@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-12-06T22:51:11Z</date>
+    <date>2021-12-12T13:40:23Z</date>
     <groups>
         <group>
             <name>Templates/Futur-Tech/Applications</name>
@@ -673,12 +673,12 @@ return JSON.stringify(lld);</params>
             <macros>
                 <macro>
                     <macro>{$STORAGECRAFT.BACKUP.CRIT}</macro>
-                    <value>3d</value>
+                    <value>5d</value>
                     <description>Critical max age for latest successful Backup</description>
                 </macro>
                 <macro>
                     <macro>{$STORAGECRAFT.BACKUP.WARN}</macro>
-                    <value>1d</value>
+                    <value>3d</value>
                     <description>Warning max age for latest successful Backup</description>
                 </macro>
                 <macro>
