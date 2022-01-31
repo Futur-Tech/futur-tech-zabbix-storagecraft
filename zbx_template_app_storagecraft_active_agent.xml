@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-12-12T13:40:23Z</date>
+    <date>2022-01-31T09:41:48Z</date>
     <groups>
         <group>
             <name>Templates/Futur-Tech/Applications</name>
@@ -116,6 +116,16 @@
                             <priority>AVERAGE</priority>
                             <description>This trigger need to be manually closed.</description>
                             <type>MULTIPLE</type>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                        <trigger>
+                            <expression>{nodata(7d)}=0&#13;
+and {$MEM.PAGE_SEC.CRIT.MAX}&lt;=5000</expression>
+                            <name>Host macro value MEM.PAGE_SEC.CRIT.MAX is too low and could create false alarm</name>
+                            <opdata>Curent: {$MEM.PAGE_SEC.CRIT.MAX}. Recommended when ImageManager is running: 20000</opdata>
+                            <priority>INFO</priority>
+                            <description>When StorageCraft ImageManager is running, the Memory Pages/sec value is often between 10000 and 20000 during the backup collapse process. &#13;
+The default warning trigger for Zabbix is 1000. It is advised to increase the value of MEM.PAGE_SEC.CRIT.MAX in this host configuration to 20000.</description>
                             <manual_close>YES</manual_close>
                         </trigger>
                         <trigger>
@@ -489,8 +499,13 @@ if (matches[2]) {
     row[&quot;{#SITECODE}&quot;] = matches[2];
     row[&quot;{#MACHINE}&quot;] = matches[3];
 } else {
-    row[&quot;{#SITECODE}&quot;] = matches[4];
-    row[&quot;{#MACHINE}&quot;] = matches[5];
+    if (matches[5].toUpperCase()==&quot;FT-BACKUP&quot;) {
+        row[&quot;{#SITECODE}&quot;] = &quot;NO_SITECODE&quot;;
+        row[&quot;{#MACHINE}&quot;] = matches[4];
+    } else {
+        row[&quot;{#SITECODE}&quot;] = matches[4];
+        row[&quot;{#MACHINE}&quot;] = matches[5];
+    }
 }
 row[&quot;{#MACHINE_UPPER}&quot;] = row[&quot;{#MACHINE}&quot;].toUpperCase();
 row[&quot;{#VOL}&quot;] = matches[6];
@@ -688,7 +703,7 @@ return JSON.stringify(lld);</params>
                 </macro>
                 <macro>
                     <macro>{$STORAGECRAFT.COLLAPSE.CHKDSK.CRIT}</macro>
-                    <value>10d</value>
+                    <value>14d</value>
                     <description>Max age for latest successful CHKDSK on Collapse</description>
                 </macro>
                 <macro>
@@ -698,7 +713,7 @@ return JSON.stringify(lld);</params>
                 </macro>
                 <macro>
                     <macro>{$STORAGECRAFT.COLLAPSE.CRIT}</macro>
-                    <value>5d</value>
+                    <value>7d</value>
                     <description>Critical max age for latest successful Collapse</description>
                 </macro>
                 <macro>
@@ -733,7 +748,7 @@ return JSON.stringify(lld);</params>
                 </macro>
                 <macro>
                     <macro>{$STORAGECRAFT.COLLAPSE.WARN}</macro>
-                    <value>3d</value>
+                    <value>4d</value>
                     <description>Warning max age for latest successful Collapse</description>
                 </macro>
             </macros>
