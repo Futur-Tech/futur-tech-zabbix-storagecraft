@@ -18,9 +18,11 @@ I only store my backups on NAS... so the Regex in the template are only working 
 ```
 \\nas\mountname\MACHINE\ft-backup\C_VOL-b001-i001-cd-cw.spi 
 \\nas\mountname\MACHINE\C_VOL-b001-i001-cd-cw.spi 
+\\nas\MACHINE\ft-backup\C_VOL-b001-i001-cd-cw.spi 
+\\nas\MACHINE\C_VOL-b001-i001-cd-cw.spi 
 ```
 
-Note also that the subfolder "ft-backup" is not mandatory and only for organization purpose.
+Note also that the subfolder "ft-backup" is not mandatory and only for Futur-Tech organization purposes.
 
 ## Useful links
 https://support.storagecraft.com/s/article/Windows-Event-Log-IDs-created-by-StorageCraft-products?language=en_US
