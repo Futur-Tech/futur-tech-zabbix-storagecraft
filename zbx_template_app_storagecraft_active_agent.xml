@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2022-01-31T09:41:48Z</date>
+    <date>2022-02-14T00:28:42Z</date>
     <groups>
         <group>
             <name>Templates/Futur-Tech/Applications</name>
@@ -708,7 +708,7 @@ return JSON.stringify(lld);</params>
                 </macro>
                 <macro>
                     <macro>{$STORAGECRAFT.COLLAPSE.CHKDSK.INFO}</macro>
-                    <value>12h</value>
+                    <value>1h</value>
                     <description>Show info of successful CHKDSK during this time</description>
                 </macro>
                 <macro>
@@ -743,7 +743,7 @@ return JSON.stringify(lld);</params>
                 </macro>
                 <macro>
                     <macro>{$STORAGECRAFT.COLLAPSE.VIRTUALBOOT.INFO}</macro>
-                    <value>1d</value>
+                    <value>1h</value>
                     <description>Show info of successful VirtualBoot during this time</description>
                 </macro>
                 <macro>
