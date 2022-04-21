@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2022-02-14T00:28:42Z</date>
+    <date>2022-04-21T09:57:12Z</date>
     <groups>
         <group>
             <name>Templates/Futur-Tech/Applications</name>
@@ -61,6 +61,15 @@
                             <description>This trigger need to be manually closed.</description>
                             <type>MULTIPLE</type>
                             <manual_close>YES</manual_close>
+                            <dependencies>
+                                <dependency>
+                                    <name>ShadowProtectSPX License Refresh Failed</name>
+                                    <expression>{Template Futur-Tech App StorageCraft:eventlog[Application,,,ShadowProtectSPX,,,skip].regexp(Backup \&quot;[^\&quot;]+\&quot; on,#1)}=0 and {Template Futur-Tech App StorageCraft:eventlog[Application,,,ShadowProtectSPX,,,skip].logseverity()}=4 and {Template Futur-Tech App StorageCraft:eventlog[Application,,,ShadowProtectSPX,,,skip].regexp(License Refresh Failed,#1)}=1</expression>
+                                    <recovery_expression>{Template Futur-Tech App StorageCraft:eventlog[Application,,,ShadowProtectSPX,,,skip].regexp(successfully finished backing up,#1)}=1 &#13;
+and {Template Futur-Tech App StorageCraft:eventlog[Application,,,ShadowProtectSPX,,,skip].logseverity()}=1 &#13;
+and {Template Futur-Tech App StorageCraft:eventlog[Application,,,ShadowProtectSPX,,,skip].logeventid(3)}=1</recovery_expression>
+                                </dependency>
+                            </dependencies>
                         </trigger>
                         <trigger>
                             <expression>{regexp(Backup \&quot;[^\&quot;]+\&quot; on,#1)}=0 and {logseverity()}=1</expression>
@@ -71,6 +80,18 @@
                             <priority>INFO</priority>
                             <description>This trigger need to be manually closed.</description>
                             <type>MULTIPLE</type>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                        <trigger>
+                            <expression>{regexp(Backup \&quot;[^\&quot;]+\&quot; on,#1)}=0 and {logseverity()}=4 and {regexp(License Refresh Failed,#1)}=1</expression>
+                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                            <recovery_expression>{regexp(successfully finished backing up,#1)}=1 &#13;
+and {logseverity()}=1 &#13;
+and {logeventid(3)}=1</recovery_expression>
+                            <name>ShadowProtectSPX License Refresh Failed</name>
+                            <opdata>{{ITEM.VALUE}.regsub(&quot;([\s\S]*)&quot;, \1)}</opdata>
+                            <priority>WARNING</priority>
+                            <description>This trigger will recover on the next successful backup.</description>
                             <manual_close>YES</manual_close>
                         </trigger>
                         <trigger>
