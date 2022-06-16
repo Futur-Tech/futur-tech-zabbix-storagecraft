@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2022-04-21T09:57:12Z</date>
+    <date>2022-06-16T14:33:28Z</date>
     <groups>
         <group>
             <name>Templates/Futur-Tech/Applications</name>
@@ -226,7 +226,7 @@ and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE}&quot;}=0</expression>
                             <name>{#MACHINE_UPPER} Chkdsk [{#VOL}] Log</name>
                             <type>ZABBIX_ACTIVE</type>
                             <key>logrt[&quot;C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$&quot;,&quot;Chkdsk.+ {#VOL}[-\w]+\.spi&quot;,,,skip]</key>
-                            <delay>15m</delay>
+                            <delay>5m</delay>
                             <trends>0</trends>
                             <value_type>LOG</value_type>
                             <applications>
@@ -239,7 +239,7 @@ and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE}&quot;}=0</expression>
                             <name>{#MACHINE_UPPER} VirtualBoot [{#VOL}] Log</name>
                             <type>ZABBIX_ACTIVE</type>
                             <key>logrt[&quot;C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$&quot;,&quot;{#VOL}[-\w]+_VirtualBoot_VM| screenshot| VM|_VM_|vboxmanage|[Vv]irtual[ ]*[Bb]o|Hyper-V|^Generated (disks|incremental images)&quot;,,,skip]</key>
-                            <delay>15m</delay>
+                            <delay>5m</delay>
                             <trends>0</trends>
                             <value_type>LOG</value_type>
                             <description>Note that some lines might be missing from this log. Use the original log file located in C:\Program Files (x86)\StorageCraft\ImageManager\Logs\ for debugging.</description>
@@ -731,6 +731,11 @@ return JSON.stringify(lld);</params>
                     <macro>{$STORAGECRAFT.COLLAPSE.CHKDSK.INFO}</macro>
                     <value>1h</value>
                     <description>Show info of successful CHKDSK during this time</description>
+                </macro>
+                <macro>
+                    <macro>{$STORAGECRAFT.COLLAPSE.CHKDSK:&quot;DEVT-ST001&quot;}</macro>
+                    <value>0</value>
+                    <description>Exemple of macro for disabling chkdsk triggers for a specific chain of a machine.</description>
                 </macro>
                 <macro>
                     <macro>{$STORAGECRAFT.COLLAPSE.CRIT}</macro>
