@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2022-06-16T14:33:28Z</date>
+    <date>2022-07-19T17:26:12Z</date>
     <groups>
         <group>
             <name>Templates/Futur-Tech/Applications</name>
@@ -130,7 +130,9 @@ and {logeventid(3)}=1</recovery_expression>
                             <manual_close>YES</manual_close>
                         </trigger>
                         <trigger>
-                            <expression>{regexp(\\.+\\.+\\,#1)}=0 and {logseverity()}=4</expression>
+                            <expression>{regexp(\\.+\\.+\\,#1)}=0 &#13;
+and {logseverity()}=4&#13;
+and ({$STORAGECRAFT.DEST_IS_NOT_HA}=0 or {logeventid(1128|1129)}=0)</expression>
                             <recovery_mode>NONE</recovery_mode>
                             <name>Error in ImageManager Event Log</name>
                             <opdata>{{ITEM.VALUE}.regsub(&quot;([\s\S]*)&quot;, \1)}</opdata>
@@ -327,7 +329,8 @@ and &#13;
 and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].last()}&gt;0&#13;
 and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logseverity()}=4&#13;
 and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE} [{#VOL}]&quot;}=0 &#13;
-and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE}&quot;}=0</expression>
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE}&quot;}=0&#13;
+and ({$STORAGECRAFT.DEST_IS_NOT_HA}=0 or {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logeventid(1128|1129)}=0)</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                             <recovery_expression>{Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].regexp({#PATH_ESC}\\{#VOL}-.+\.spi,#1)}=1&#13;
 and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logseverity()}=1&#13;
@@ -486,7 +489,8 @@ and &#13;
 and {Template Futur-Tech App StorageCraft:imagemanager.collapse.age[{#MACHINE},{#VOL}].last()}&gt;0&#13;
 and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logseverity()}=4&#13;
 and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE} [{#VOL}]&quot;}=0 &#13;
-and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE}&quot;}=0</expression>
+and {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE}&quot;}=0&#13;
+and ({$STORAGECRAFT.DEST_IS_NOT_HA}=0 or {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logeventid(1128|1129)}=0)</expression>
                                     <recovery_expression>{Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].regexp({#PATH_ESC}\\{#VOL}-.+\.spi,#1)}=1&#13;
 and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logseverity()}=1&#13;
 and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft ImageManager,,,skip].logeventid(1120)}=1&#13;
@@ -628,7 +632,8 @@ and {Template Futur-Tech App StorageCraft:eventlog[Application,,,ShadowProtectSP
                         <trigger_prototype>
                             <expression>{Template Futur-Tech App StorageCraft:eventlog[Application,,,ShadowProtectSPX,,,skip].regexp(Backup \&quot;{#TASK}\&quot; on {#MACHINE},#1)}=1&#13;
 and {Template Futur-Tech App StorageCraft:shadowprotectspx.backup.age[{#MACHINE},{#TASK}].last()}&gt;0&#13;
-and {Template Futur-Tech App StorageCraft:eventlog[Application,,,ShadowProtectSPX,,,skip].logseverity()}=4</expression>
+and {Template Futur-Tech App StorageCraft:eventlog[Application,,,ShadowProtectSPX,,,skip].logseverity()}=4&#13;
+and ({$STORAGECRAFT.DEST_IS_NOT_HA}=0 or {Template Futur-Tech App StorageCraft:eventlog[Application,,,ShadowProtectSPX,,,skip].logeventid(5)}=0)</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                             <recovery_expression>{Template Futur-Tech App StorageCraft:eventlog[Application,,,ShadowProtectSPX,,,skip].regexp(Backup \&quot;{#TASK}\&quot; on {#MACHINE} successfully finished backing up,#1)}=1 &#13;
 and {Template Futur-Tech App StorageCraft:eventlog[Application,,,ShadowProtectSPX,,,skip].logseverity()}=1 &#13;
@@ -675,7 +680,8 @@ and {Template Futur-Tech App StorageCraft:eventlog[Application,,,ShadowProtectSP
                                     <name>Error in ShadowProtectSPX Event Log for {#MACHINE_UPPER} [{#TASK}]</name>
                                     <expression>{Template Futur-Tech App StorageCraft:eventlog[Application,,,ShadowProtectSPX,,,skip].regexp(Backup \&quot;{#TASK}\&quot; on {#MACHINE},#1)}=1&#13;
 and {Template Futur-Tech App StorageCraft:shadowprotectspx.backup.age[{#MACHINE},{#TASK}].last()}&gt;0&#13;
-and {Template Futur-Tech App StorageCraft:eventlog[Application,,,ShadowProtectSPX,,,skip].logseverity()}=4</expression>
+and {Template Futur-Tech App StorageCraft:eventlog[Application,,,ShadowProtectSPX,,,skip].logseverity()}=4&#13;
+and ({$STORAGECRAFT.DEST_IS_NOT_HA}=0 or {Template Futur-Tech App StorageCraft:eventlog[Application,,,ShadowProtectSPX,,,skip].logeventid(5)}=0)</expression>
                                     <recovery_expression>{Template Futur-Tech App StorageCraft:eventlog[Application,,,ShadowProtectSPX,,,skip].regexp(Backup \&quot;{#TASK}\&quot; on {#MACHINE} successfully finished backing up,#1)}=1 &#13;
 and {Template Futur-Tech App StorageCraft:eventlog[Application,,,ShadowProtectSPX,,,skip].logseverity()}=1 &#13;
 and {Template Futur-Tech App StorageCraft:eventlog[Application,,,ShadowProtectSPX,,,skip].logeventid(3)}=1</recovery_expression>
@@ -776,6 +782,11 @@ return JSON.stringify(lld);</params>
                     <macro>{$STORAGECRAFT.COLLAPSE.WARN}</macro>
                     <value>4d</value>
                     <description>Warning max age for latest successful Collapse</description>
+                </macro>
+                <macro>
+                    <macro>{$STORAGECRAFT.DEST_IS_NOT_HA}</macro>
+                    <value>0</value>
+                    <description>Set true if destination for Backup and Collapse is not always reachable. Will ignore some backups and collapse error log triggers.</description>
                 </macro>
             </macros>
         </template>
