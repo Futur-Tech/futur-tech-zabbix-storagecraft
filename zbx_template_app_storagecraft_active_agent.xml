@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2022-07-19T17:26:12Z</date>
+    <date>2022-08-01T08:45:25Z</date>
     <groups>
         <group>
             <name>Templates/Futur-Tech/Applications</name>
@@ -133,11 +133,13 @@ and {logeventid(3)}=1</recovery_expression>
                             <expression>{regexp(\\.+\\.+\\,#1)}=0 &#13;
 and {logseverity()}=4&#13;
 and ({$STORAGECRAFT.DEST_IS_NOT_HA}=0 or {logeventid(1128|1129)}=0)</expression>
-                            <recovery_mode>NONE</recovery_mode>
+                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                            <recovery_expression>{logseverity()}=1&#13;
+and ({$STORAGECRAFT.DEST_IS_NOT_HA}=1 or {logeventid(0)}=1)</recovery_expression>
                             <name>Error in ImageManager Event Log</name>
                             <opdata>{{ITEM.VALUE}.regsub(&quot;([\s\S]*)&quot;, \1)}</opdata>
                             <priority>AVERAGE</priority>
-                            <description>This trigger need to be manually closed.</description>
+                            <description>This trigger will be closed manually or will recover on next successful ImageManager  service start.</description>
                             <type>MULTIPLE</type>
                             <manual_close>YES</manual_close>
                         </trigger>
