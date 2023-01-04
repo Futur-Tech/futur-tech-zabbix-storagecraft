@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2022-12-11T12:02:34Z</date>
+    <date>2023-01-04T09:01:50Z</date>
     <groups>
         <group>
             <name>Templates/Futur-Tech/Applications</name>
@@ -401,7 +401,7 @@ and {Template Futur-Tech App StorageCraft:eventlog[Application,,,StorageCraft Im
 or ({$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE} [{#VOL}]&quot;}=1&#13;
     or {$STORAGECRAFT.COLLAPSE.IGNORE:&quot;{#MACHINE}&quot;}=1)</recovery_expression>
                             <name>ImageManager is unable to enumerate files for {#MACHINE_UPPER} [{#VOL}]</name>
-                            <opdata>Last collapse age: {ITEM.LASTVALUE4}, ImageManager Log: {ITEM.VALUE1}</opdata>
+                            <opdata>Last collapse age: {ITEM.LASTVALUE5}, ImageManager Log: {ITEM.VALUE1}</opdata>
                             <priority>WARNING</priority>
                             <description>This error is usually because of network issue</description>
                             <manual_close>YES</manual_close>
