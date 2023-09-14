@@ -1,0 +1,1018 @@
+zabbix_export:
+  version: '6.0'
+  date: '2023-09-14T13:50:36Z'
+  groups:
+    - uuid: 7f27dc73981940769811e7fae4a26772
+      name: Templates/Futur-Tech/Applications
+  templates:
+    - uuid: d0f8a75ecd284c559bbfff4b0c4e91c6
+      template: 'Futur-Tech App StorageCraft'
+      name: 'Futur-Tech App StorageCraft'
+      description: 'https://github.com/Futur-Tech/futur-tech-zabbix-storagecraft'
+      groups:
+        - name: Templates/Futur-Tech/Applications
+      items:
+        - uuid: b051bf4e1dd44d009b42a2f47b03763a
+          name: 'ShadowProtectSPX: Event log'
+          type: ZABBIX_ACTIVE
+          key: 'eventlog[Application,,,ShadowProtectSPX,,,skip]'
+          delay: 10m
+          trends: '0'
+          value_type: LOG
+          tags:
+            - tag: component
+              value: backup
+            - tag: storagecraft
+              value: shadowprotectspx
+          triggers:
+            - uuid: bd3fa75e72c6439384fb893e6808de85
+              expression: |
+                find(/Futur-Tech App StorageCraft/eventlog[Application,,,ShadowProtectSPX,,,skip],,"regexp","([Bb]ackup|[Ss]auvegarde) (\"|«\xA0)[^\"»]+(\"|\xA0») (on|sur) ")=0 
+                and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,ShadowProtectSPX,,,skip])=9
+              recovery_mode: NONE
+              name: 'Critical Error in ShadowProtectSPX Event Log'
+              opdata: '{{ITEM.VALUE}.regsub("([\s\S]*)", \1)}'
+              priority: HIGH
+              description: 'This trigger need to be manually closed.'
+              type: MULTIPLE
+              manual_close: 'YES'
+            - uuid: 206bfc768c89483187dcb4a8eb7f27a3
+              expression: |
+                find(/Futur-Tech App StorageCraft/eventlog[Application,,,ShadowProtectSPX,,,skip],,"regexp","([Bb]ackup|[Ss]auvegarde) (\"|«\xA0)[^\"»]+(\"|\xA0») (on|sur) ")=0 
+                and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,ShadowProtectSPX,,,skip])=4
+              recovery_mode: NONE
+              name: 'Error in ShadowProtectSPX Event Log'
+              opdata: '{{ITEM.VALUE}.regsub("([\s\S]*)", \1)}'
+              priority: AVERAGE
+              description: 'This trigger need to be manually closed.'
+              type: MULTIPLE
+              manual_close: 'YES'
+              dependencies:
+                - name: 'ShadowProtectSPX License Refresh Failed'
+                  expression: 'find(/Futur-Tech App StorageCraft/eventlog[Application,,,ShadowProtectSPX,,,skip],#1,"regexp","^License Refresh Failed")=1'
+                  recovery_expression: |
+                    logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,ShadowProtectSPX,,,skip])=1 
+                    and logeventid(/Futur-Tech App StorageCraft/eventlog[Application,,,ShadowProtectSPX,,,skip],,"3")=1
+            - uuid: e1f2264f2e024c79888516cdd58a014b
+              expression: 'find(/Futur-Tech App StorageCraft/eventlog[Application,,,ShadowProtectSPX,,,skip],#1,"regexp","^License Refresh Failed")=1'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: |
+                logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,ShadowProtectSPX,,,skip])=1 
+                and logeventid(/Futur-Tech App StorageCraft/eventlog[Application,,,ShadowProtectSPX,,,skip],,"3")=1
+              name: 'ShadowProtectSPX License Refresh Failed'
+              priority: WARNING
+              description: 'This trigger will recover on the next successful backup.'
+              manual_close: 'YES'
+            - uuid: 9035ccbb8fe245e795fddc6d1f56b96d
+              expression: |
+                find(/Futur-Tech App StorageCraft/eventlog[Application,,,ShadowProtectSPX,,,skip],,"regexp","([Bb]ackup|[Ss]auvegarde) (\"|«\xA0)[^\"»]+(\"|\xA0») (on|sur) ")=0 
+                and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,ShadowProtectSPX,,,skip])=2
+              recovery_mode: NONE
+              name: 'Warning in ShadowProtectSPX Event Log'
+              opdata: '{{ITEM.VALUE}.regsub("([\s\S]*)", \1)}'
+              priority: WARNING
+              description: 'This trigger need to be manually closed.'
+              type: MULTIPLE
+              manual_close: 'YES'
+        - uuid: 5ceb8f31d42144b795182c9e3299200d
+          name: 'ImageManager: Event log'
+          type: ZABBIX_ACTIVE
+          key: 'eventlog[Application,,,StorageCraft ImageManager,,,skip]'
+          delay: 10m
+          trends: '0'
+          value_type: LOG
+          tags:
+            - tag: component
+              value: backup
+            - tag: storagecraft
+              value: imagemanager
+          triggers:
+            - uuid: c117096567e34b6eb808f2815fc3a584
+              expression: 'find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","\\.+\\.+\\")=0 and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip])=9'
+              recovery_mode: NONE
+              name: 'Critical Error in ImageManager Event Log'
+              opdata: '{{ITEM.VALUE}.regsub("([\s\S]*)", \1)}'
+              priority: HIGH
+              description: 'This trigger need to be manually closed.'
+              type: MULTIPLE
+              manual_close: 'YES'
+            - uuid: d688a3c140234c9d898cd3a00b6de444
+              expression: |
+                find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","\\.+\\.+\\")=0 
+                and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip])=4
+                and ({$STORAGECRAFT.DEST_IS_NOT_HA}=0 or logeventid(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],,"1128|1129")=0)
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: |
+                logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip])=1
+                and ({$STORAGECRAFT.DEST_IS_NOT_HA}=1 or logeventid(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],,"0")=1)
+              name: 'Error in ImageManager Event Log'
+              opdata: '{{ITEM.VALUE}.regsub("([\s\S]*)", \1)}'
+              priority: AVERAGE
+              description: 'This trigger will be closed manually or will recover on next successful ImageManager  service start.'
+              type: MULTIPLE
+              manual_close: 'YES'
+            - uuid: 906e185730a64a1597edf853fa44a2fe
+              expression: |
+                nodata(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],7d)=0
+                and {$MEM.PAGE_SEC.CRIT.MAX}<=5000
+              name: 'Host macro value MEM.PAGE_SEC.CRIT.MAX is too low and could create false alarm'
+              opdata: 'Curent: {$MEM.PAGE_SEC.CRIT.MAX}. Recommended when ImageManager is running: 20000'
+              priority: INFO
+              description: |
+                When StorageCraft ImageManager is running, the Memory Pages/sec value is often between 10000 and 20000 during the backup collapse process. 
+                The default warning trigger for Zabbix is 1000. It is advised to increase the value of MEM.PAGE_SEC.CRIT.MAX in this host configuration to 20000.
+              manual_close: 'YES'
+            - uuid: c8fd82e78d134f26b1e74eeb0947781d
+              expression: 'find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","\\.+\\.+\\")=0 and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip])=2'
+              recovery_mode: NONE
+              name: 'Warning in ImageManager Event Log'
+              opdata: '{{ITEM.VALUE}.regsub("([\s\S]*)", \1)}'
+              priority: WARNING
+              description: 'This trigger need to be manually closed.'
+              type: MULTIPLE
+              manual_close: 'YES'
+        - uuid: 6f7db535c14c4df594c3e2a02dfd60d0
+          name: 'ShadowProtectSPX: Service log'
+          type: ZABBIX_ACTIVE
+          key: 'logrt[C:\ProgramData\StorageCraft\spx\log\^spx_service\.log$,,,100,skip,,,mtime-noreread]'
+          trends: '0'
+          value_type: LOG
+          logtimefmt: 'yyyy-MM-dd hh:mm:ss'
+          tags:
+            - tag: component
+              value: backup
+            - tag: storagecraft
+              value: shadowprotectspx
+        - uuid: eb6fe96bc8f5474b8c4c1f1c127be5a2
+          name: 'ImageManager: Service log'
+          type: ZABBIX_ACTIVE
+          key: 'logrt[C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^ImageManager\.log$,,,100,skip,,,mtime-noreread]'
+          trends: '0'
+          value_type: LOG
+          logtimefmt: 'yyyy-MM-dd hh:mm:ss'
+          preprocessing:
+            - type: MATCHES_REGEX
+              parameters:
+                - .+
+              error_handler: DISCARD_VALUE
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var logLine = value;
+                  
+                  // Map French and English abbreviated month names to their numeric values
+                  const monthMapping = {
+                      'janv.': '01', 'Jan': '01',
+                      'févr.': '02', 'Feb': '02',
+                      'mars': '03', 'Mar': '03',
+                      'avr.': '04', 'Apr': '04',
+                      'mai': '05', 'May': '05',
+                      'juin': '06', 'Jun': '06',
+                      'juil.': '07', 'Jul': '07',
+                      'août': '08', 'Aug': '08',
+                      'sept.': '09', 'Sep': '09',
+                      'oct.': '10', 'Oct': '10',
+                      'nov.': '11', 'Nov': '11',
+                      'déc.': '12', 'Dec': '12'
+                  };
+                  
+                  // Use regex to find and replace French or English date format within the log line
+                  var convertedLog = logLine.replace(/(\d+)-([A-Za-zéû\.]+)-(\d+)/, function(match, day, month, year) {
+                      if (monthMapping[month]) {
+                          if (day.length === 1) day = "0" + day;
+                          var newDate = year + "-" + monthMapping[month] + "-" + day;
+                          return newDate;
+                      }
+                      return match; // If the month doesn't match, return the original substring
+                  });
+                  
+                  return convertedLog;
+                  
+          tags:
+            - tag: component
+              value: backup
+            - tag: storagecraft
+              value: imagemanager
+      discovery_rules:
+        - uuid: 387d7324137a4232a97bc4038815c4e8
+          name: 'ImageManager Discovery'
+          type: DEPENDENT
+          key: storagecraft.imagemanager.discovery
+          delay: '0'
+          lifetime: 90d
+          item_prototypes:
+            - uuid: 864fe29e03cc40a79cce3d1df64f2853
+              name: 'Collapse [{#MACHINE_UPPER}/{#VOL}] age'
+              type: CALCULATED
+              key: 'imagemanager.collapse.age[{#MACHINE},{#VOL}]'
+              delay: 10m
+              units: uptime
+              params: 'now()-last(//imagemanager.collapse.success[{#MACHINE},{#VOL}])'
+              tags:
+                - tag: component
+                  value: backup
+                - tag: dashboard
+                  value: imagemanager
+                - tag: storagecraft
+                  value: imagemanager
+              trigger_prototypes:
+                - uuid: b5af69c7077544c9bd3d659108dd1d0a
+                  expression: |
+                    last(/Futur-Tech App StorageCraft/imagemanager.collapse.age[{#MACHINE},{#VOL}])>{$STORAGECRAFT.COLLAPSE.CRIT:"{#MACHINE_UPPER}"}
+                    and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=0 
+                    and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=0
+                  name: 'No ImageManager [{#MACHINE_UPPER}/{#VOL}] collapse for more than {$STORAGECRAFT.COLLAPSE.CRIT:"{#MACHINE_UPPER}"}'
+                  opdata: 'Last collapse age: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                - uuid: 24d93a9c934c4bb39b0d544f189fe198
+                  expression: |
+                    last(/Futur-Tech App StorageCraft/imagemanager.collapse.age[{#MACHINE},{#VOL}])>{$STORAGECRAFT.COLLAPSE.WARN:"{#MACHINE_UPPER}"}
+                    and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=0 
+                    and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=0
+                  name: 'No ImageManager [{#MACHINE_UPPER}/{#VOL}] collapse for more than {$STORAGECRAFT.COLLAPSE.WARN:"{#MACHINE_UPPER}"}'
+                  opdata: 'Last collapse age: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  dependencies:
+                    - name: 'No ImageManager [{#MACHINE_UPPER}/{#VOL}] collapse for more than {$STORAGECRAFT.COLLAPSE.CRIT:"{#MACHINE_UPPER}"}'
+                      expression: |
+                        last(/Futur-Tech App StorageCraft/imagemanager.collapse.age[{#MACHINE},{#VOL}])>{$STORAGECRAFT.COLLAPSE.CRIT:"{#MACHINE_UPPER}"}
+                        and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=0 
+                        and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=0
+            - uuid: f5ac69a26ced49c39d07dceee77f5bb8
+              name: 'Collapse [{#MACHINE_UPPER}/{#VOL}] chkdsk log'
+              type: DEPENDENT
+              key: 'imagemanager.collapse.chkdsk.log[{#MACHINE},{#VOL}]'
+              delay: '0'
+              trends: '0'
+              value_type: LOG
+              preprocessing:
+                - type: MATCHES_REGEX
+                  parameters:
+                    - 'Chkdsk.+: {#VOL}[-\w]+\.spi'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: 'logrt["C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$",,,100,skip,,,mtime-noreread]'
+              tags:
+                - tag: component
+                  value: backup
+                - tag: storagecraft
+                  value: imagemanager
+              trigger_prototypes:
+                - uuid: 7629e96fb90e46079a86d71b4bac2777
+                  expression: |
+                    find(/Futur-Tech App StorageCraft/imagemanager.collapse.chkdsk.log[{#MACHINE},{#VOL}],#1,"regexp","Chkdsk verify failed: {#VOL}[-\w]+\.spi")=1
+                    and now()>0
+                    and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=0 
+                    and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=0
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: |
+                    find(/Futur-Tech App StorageCraft/imagemanager.collapse.chkdsk.log[{#MACHINE},{#VOL}],#1,"regexp","Chkdsk verify succeeded: {#VOL}[-\w]+\.spi \(No errors were found\)")=1
+                    or ({$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=1
+                        or {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=1)
+                  name: 'CHKDSK Error for [{#MACHINE_UPPER}/{#VOL}] collapse'
+                  opdata: 'Log: {{ITEM.VALUE}.regsub("(.*)", \1)}'
+                  priority: AVERAGE
+                - uuid: db9c2ed17069434b91c618e5b7df5f88
+                  expression: |
+                    (now()-last(/Futur-Tech App StorageCraft/imagemanager.collapse.chkdsk.log[{#MACHINE},{#VOL}]))<{$STORAGECRAFT.COLLAPSE.CHKDSK.INFO} 
+                    and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=0 and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=0
+                  name: 'Successful CHKDSK for [{#MACHINE_UPPER}/{#VOL}] collapse in last {$STORAGECRAFT.COLLAPSE.CHKDSK.INFO}'
+                  opdata: 'Log: {ITEM.LASTVALUE1}'
+                  priority: INFO
+            - uuid: 43379856a51647b190ab96a6474b83bd
+              name: 'Collapse [{#MACHINE_UPPER}/{#VOL}] chkdsk success'
+              type: DEPENDENT
+              key: 'imagemanager.collapse.chkdsk.success[{#MACHINE},{#VOL}]'
+              delay: '0'
+              units: unixtime
+              preprocessing:
+                - type: MATCHES_REGEX
+                  parameters:
+                    - 'Chkdsk verify succeeded: {#VOL}[-\w]+\.spi \(No errors were found\)'
+                  error_handler: DISCARD_VALUE
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      // Input string
+                      var inputStr = value;
+                      
+                      // Extract date-time and duration using regex
+                      var regex = /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})/;
+                      var match = inputStr.match(regex);
+                      
+                      if (!match) {
+                          return "Invalid input format";
+                      }
+                      
+                      // Extracted values
+                      var dateTimeStr = match[1];
+                      
+                      // Convert the date string to a Date object
+                      var date = new Date(dateTimeStr);
+                      
+                      // Adjust for timezone
+                      var timezoneOffsetInSeconds = date.getTimezoneOffset() * 60;
+                      var adjustedTimestamp = (date.getTime() / 1000) + timezoneOffsetInSeconds;
+                      
+                      return Math.floor(adjustedTimestamp).toString();
+                      
+              master_item:
+                key: 'imagemanager.collapse.chkdsk.log[{#MACHINE},{#VOL}]'
+              tags:
+                - tag: component
+                  value: backup
+                - tag: storagecraft
+                  value: imagemanager
+              trigger_prototypes:
+                - uuid: 3f10a35f0de34dde9e35b39da733a31b
+                  expression: |
+                    (now()-last(/Futur-Tech App StorageCraft/imagemanager.collapse.chkdsk.success[{#MACHINE},{#VOL}]))>{$STORAGECRAFT.COLLAPSE.CHKDSK.CRIT} 
+                    and {$STORAGECRAFT.COLLAPSE.CHKDSK:"{#MACHINE_UPPER}"}=1 
+                    and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=0 
+                    and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=0
+                  name: 'No CHKDSK for [{#MACHINE_UPPER}/{#VOL}] collapse in last {$STORAGECRAFT.COLLAPSE.CHKDSK.CRIT}'
+                  opdata: 'Last chkdsk: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  dependencies:
+                    - name: 'CHKDSK Error for [{#MACHINE_UPPER}/{#VOL}] collapse'
+                      expression: |
+                        find(/Futur-Tech App StorageCraft/imagemanager.collapse.chkdsk.log[{#MACHINE},{#VOL}],#1,"regexp","Chkdsk verify failed: {#VOL}[-\w]+\.spi")=1
+                        and now()>0
+                        and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=0 
+                        and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=0
+                      recovery_expression: |
+                        find(/Futur-Tech App StorageCraft/imagemanager.collapse.chkdsk.log[{#MACHINE},{#VOL}],#1,"regexp","Chkdsk verify succeeded: {#VOL}[-\w]+\.spi \(No errors were found\)")=1
+                        or ({$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=1
+                            or {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=1)
+            - uuid: 39a9ac7cbc784597b3d150c6b7f34c2f
+              name: 'Collapse [{#MACHINE_UPPER}/{#VOL}] success log'
+              type: DEPENDENT
+              key: 'imagemanager.collapse.success.log[{#MACHINE},{#VOL}]'
+              delay: '0'
+              trends: '0'
+              value_type: LOG
+              logtimefmt: 'yyyy-MM-dd hh:mm:ss'
+              preprocessing:
+                - type: MATCHES_REGEX
+                  parameters:
+                    - '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} {#PATH}\\{#VOL}.+.spi$'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: 'logrt[C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^ImageManager\.log$,,,100,skip,,,mtime-noreread]'
+              tags:
+                - tag: component
+                  value: backup
+                - tag: storagecraft
+                  value: imagemanager
+            - uuid: 05afe8b05c564b8fab42e7fa9747da93
+              name: 'Collapse [{#MACHINE_UPPER}/{#VOL}] success'
+              type: DEPENDENT
+              key: 'imagemanager.collapse.success[{#MACHINE},{#VOL}]'
+              delay: '0'
+              units: unixtime
+              preprocessing:
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      // Input string
+                      var inputStr = value;
+                      
+                      // Extract date-time and duration using regex
+                      var regex = /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})/;
+                      var match = inputStr.match(regex);
+                      
+                      if (!match) {
+                          return "Invalid input format";
+                      }
+                      
+                      // Extracted values
+                      var dateTimeStr = match[1];
+                      
+                      // Convert the date string to a Date object
+                      var date = new Date(dateTimeStr);
+                      
+                      // Adjust for timezone
+                      var timezoneOffsetInSeconds = date.getTimezoneOffset() * 60;
+                      var adjustedTimestamp = (date.getTime() / 1000) + timezoneOffsetInSeconds;
+                      
+                      return Math.floor(adjustedTimestamp).toString();
+                      
+              master_item:
+                key: 'imagemanager.collapse.success.log[{#MACHINE},{#VOL}]'
+              tags:
+                - tag: component
+                  value: backup
+                - tag: storagecraft
+                  value: imagemanager
+            - uuid: 7daf25acfc3646ce8476ab03d90ae300
+              name: 'Collapse [{#MACHINE_UPPER}] VirtualBoot log'
+              type: DEPENDENT
+              key: 'imagemanager.collapse.virtualboot.log[{#MACHINE}]'
+              delay: '0'
+              trends: '0'
+              value_type: LOG
+              logtimefmt: 'yyyy-MM-dd hh:mm:ss'
+              preprocessing:
+                - type: MATCHES_REGEX
+                  parameters:
+                    - '_VOL[-\w]+_VirtualBoot_VM| screenshot| VM|_VM_|vboxmanage|[Vv]irtual[ ]*[Bb]o|Hyper-V|^Generated (disks|incremental images)'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: 'logrt["C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$",,,100,skip,,,mtime-noreread]'
+              tags:
+                - tag: component
+                  value: backup
+                - tag: storagecraft
+                  value: imagemanager
+              trigger_prototypes:
+                - uuid: d01634dbbbed40b28c903595fdec6547
+                  expression: |
+                    find(/Futur-Tech App StorageCraft/imagemanager.collapse.virtualboot.log[{#MACHINE}],{$STORAGECRAFT.COLLAPSE.VIRTUALBOOT.CRIT},"regexp","^Took screenshot")=0 
+                    and {$STORAGECRAFT.COLLAPSE.VIRTUALBOOT:"{#MACHINE_UPPER}"}=1 
+                    and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=0
+                  name: 'No VirtualBoot for [{#MACHINE_UPPER}] collapse in last {$STORAGECRAFT.COLLAPSE.VIRTUALBOOT.CRIT}'
+                  opdata: 'Last VirtualBoot: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  dependencies:
+                    - name: 'No CHKDSK for [{#MACHINE_UPPER}/{#VOL}] collapse in last {$STORAGECRAFT.COLLAPSE.CHKDSK.CRIT}'
+                      expression: |
+                        (now()-last(/Futur-Tech App StorageCraft/imagemanager.collapse.chkdsk.success[{#MACHINE},{#VOL}]))>{$STORAGECRAFT.COLLAPSE.CHKDSK.CRIT} 
+                        and {$STORAGECRAFT.COLLAPSE.CHKDSK:"{#MACHINE_UPPER}"}=1 
+                        and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=0 
+                        and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=0
+                    - name: 'VirtualBoot Error for [{#MACHINE_UPPER}] collapse'
+                      expression: 'find(/Futur-Tech App StorageCraft/imagemanager.collapse.virtualboot.log[{#MACHINE}],#1,"regexp","virtual boot exception: {#VOL}[-\w]+\.spi")=1 and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=0'
+                      recovery_expression: 'find(/Futur-Tech App StorageCraft/imagemanager.collapse.virtualboot.log[{#MACHINE}],#1,"regexp","^Took screenshot")=1 or ({$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=1)'
+                - uuid: b1181430467f4a568e8b567afe6b795d
+                  expression: 'find(/Futur-Tech App StorageCraft/imagemanager.collapse.virtualboot.log[{#MACHINE}],{$STORAGECRAFT.COLLAPSE.VIRTUALBOOT.INFO},"regexp","^Took screenshot")=1 and ({$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=0)'
+                  name: 'Successful VirtualBoot for [{#MACHINE_UPPER}] collapse in last {$STORAGECRAFT.COLLAPSE.VIRTUALBOOT.INFO} (Verify screenshot sent by email))'
+                  opdata: 'Log: {{ITEM.VALUE}.regsub("(.*)", \1)}'
+                  priority: INFO
+                - uuid: fde593cd018c4220888a5ac159fbe434
+                  expression: 'find(/Futur-Tech App StorageCraft/imagemanager.collapse.virtualboot.log[{#MACHINE}],#1,"regexp","virtual boot exception: {#VOL}[-\w]+\.spi")=1 and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=0'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'find(/Futur-Tech App StorageCraft/imagemanager.collapse.virtualboot.log[{#MACHINE}],#1,"regexp","^Took screenshot")=1 or ({$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=1)'
+                  name: 'VirtualBoot Error for [{#MACHINE_UPPER}] collapse'
+                  opdata: 'Log: {{ITEM.VALUE}.regsub("(.*)", \1)}'
+                  priority: HIGH
+                  description: 'VirtualBoot Error Codes: https://support.storagecraft.com/s/article/verify-backup-images?language=en_US#node_29604'
+            - uuid: 0e3c137ab8a54d72a4396de266708193
+              name: 'Collapse [{#MACHINE_UPPER}] log'
+              type: ZABBIX_ACTIVE
+              key: 'logrt["C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^\[{#PATH_LOGNAME}\]-\d+\.log$",,,100,skip,,,mtime-noreread]'
+              trends: '0'
+              value_type: LOG
+              preprocessing:
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var logLine = value;
+                      
+                      // Map French and English abbreviated month names to their numeric values
+                      const monthMapping = {
+                          'janv.': '01', 'Jan': '01',
+                          'févr.': '02', 'Feb': '02',
+                          'mars': '03', 'Mar': '03',
+                          'avr.': '04', 'Apr': '04',
+                          'mai': '05', 'May': '05',
+                          'juin': '06', 'Jun': '06',
+                          'juil.': '07', 'Jul': '07',
+                          'août': '08', 'Aug': '08',
+                          'sept.': '09', 'Sep': '09',
+                          'oct.': '10', 'Oct': '10',
+                          'nov.': '11', 'Nov': '11',
+                          'déc.': '12', 'Dec': '12'
+                      };
+                      
+                      // Use regex to find and replace French or English date format within the log line
+                      var convertedLog = logLine.replace(/(\d+)-([A-Za-zéû\.]+)-(\d+)/, function(match, day, month, year) {
+                          if (monthMapping[month]) {
+                              if (day.length === 1) day = "0" + day;
+                              var newDate = year + "-" + monthMapping[month] + "-" + day;
+                              return newDate;
+                          }
+                          return match; // If the month doesn't match, return the original substring
+                      });
+                      
+                      return convertedLog;
+                      
+              tags:
+                - tag: component
+                  value: backup
+                - tag: storagecraft
+                  value: imagemanager
+          trigger_prototypes:
+            - uuid: e34fbe0842b74f24bb20889e20c58c56
+              expression: |
+                find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","{#PATH_ESC}")=1
+                and 
+                    (find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","[\W]{#VOL}-.+\.spi")=1 
+                    or
+                    find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","_VOL-b\d+-.+\.spi")=0) 
+                and last(/Futur-Tech App StorageCraft/imagemanager.collapse.age[{#MACHINE},{#VOL}])>0
+                and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip])=9
+                and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=0 
+                and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=0
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: |
+                find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","{#PATH_ESC}\\{#VOL}-.+\.spi")=1
+                and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip])=1
+                and logeventid(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],,"1120")=1
+                or ({$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=1
+                    or {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=1)
+              name: 'Critical Error in ImageManager Event Log for [{#MACHINE_UPPER}/{#VOL}]'
+              opdata: 'Last collapse age: {ITEM.LASTVALUE4}, ImageManager Log: {ITEM.VALUE1}'
+              priority: HIGH
+              manual_close: 'YES'
+            - uuid: f15af49901a945f189b43fd6bb1fd7b2
+              expression: |
+                find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","{#PATH_ESC}")=1
+                and 
+                    (find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","[\W]{#VOL}-.+\.spi")=1 
+                    or
+                    find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","_VOL-b\d+-.+\.spi")=0) 
+                and last(/Futur-Tech App StorageCraft/imagemanager.collapse.age[{#MACHINE},{#VOL}])>0
+                and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip])=4
+                and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=0 
+                and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=0
+                and ({$STORAGECRAFT.DEST_IS_NOT_HA}=0 or logeventid(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],,"1128|1129")=0)
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: |
+                find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","{#PATH_ESC}\\{#VOL}-.+\.spi")=1
+                and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip])=1
+                and logeventid(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],,"1120")=1
+                or ({$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=1
+                    or {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=1)
+              name: 'Error in ImageManager Event Log for [{#MACHINE_UPPER}/{#VOL}]'
+              opdata: 'Last collapse age: {ITEM.LASTVALUE4}, ImageManager Log: {ITEM.VALUE1}'
+              priority: AVERAGE
+              manual_close: 'YES'
+              dependencies:
+                - name: 'Critical Error in ImageManager Event Log for [{#MACHINE_UPPER}/{#VOL}]'
+                  expression: |
+                    find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","{#PATH_ESC}")=1
+                    and 
+                        (find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","[\W]{#VOL}-.+\.spi")=1 
+                        or
+                        find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","_VOL-b\d+-.+\.spi")=0) 
+                    and last(/Futur-Tech App StorageCraft/imagemanager.collapse.age[{#MACHINE},{#VOL}])>0
+                    and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip])=9
+                    and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=0 
+                    and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=0
+                  recovery_expression: |
+                    find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","{#PATH_ESC}\\{#VOL}-.+\.spi")=1
+                    and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip])=1
+                    and logeventid(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],,"1120")=1
+                    or ({$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=1
+                        or {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=1)
+                - name: 'ImageManager is unable to enumerate files for [{#MACHINE_UPPER}/{#VOL}]'
+                  expression: |
+                    find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","unable to enumerate files:")=1
+                    and find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","{#PATH_ESC}")=1
+                    and 
+                        (find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","[\W]{#VOL}-.+\.spi")=1 
+                        or
+                        find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","_VOL-b\d+-.+\.spi")=0) 
+                    and last(/Futur-Tech App StorageCraft/imagemanager.collapse.age[{#MACHINE},{#VOL}])>0
+                    and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip])=4
+                    and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=0 
+                    and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=0
+                    and ({$STORAGECRAFT.DEST_IS_NOT_HA}=0 or logeventid(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],,"1128|1129")=0)
+                  recovery_expression: |
+                    find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","{#PATH_ESC}\\{#VOL}-.+\.spi")=1
+                    and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip])=1
+                    and logeventid(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],,"1120")=1
+                    or ({$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=1
+                        or {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=1)
+            - uuid: 9cf48e47264c49bcb3edd11af9a2025b
+              expression: |
+                find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","unable to enumerate files:")=1
+                and find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","{#PATH_ESC}")=1
+                and 
+                    (find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","[\W]{#VOL}-.+\.spi")=1 
+                    or
+                    find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","_VOL-b\d+-.+\.spi")=0) 
+                and last(/Futur-Tech App StorageCraft/imagemanager.collapse.age[{#MACHINE},{#VOL}])>0
+                and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip])=4
+                and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=0 
+                and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=0
+                and ({$STORAGECRAFT.DEST_IS_NOT_HA}=0 or logeventid(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],,"1128|1129")=0)
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: |
+                find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","{#PATH_ESC}\\{#VOL}-.+\.spi")=1
+                and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip])=1
+                and logeventid(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],,"1120")=1
+                or ({$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=1
+                    or {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=1)
+              name: 'ImageManager is unable to enumerate files for [{#MACHINE_UPPER}/{#VOL}]'
+              opdata: 'Last collapse age: {ITEM.LASTVALUE5}, ImageManager Log: {ITEM.VALUE1}'
+              priority: WARNING
+              description: 'This error is usually because of network issue'
+              manual_close: 'YES'
+              dependencies:
+                - name: 'Critical Error in ImageManager Event Log for [{#MACHINE_UPPER}/{#VOL}]'
+                  expression: |
+                    find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","{#PATH_ESC}")=1
+                    and 
+                        (find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","[\W]{#VOL}-.+\.spi")=1 
+                        or
+                        find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","_VOL-b\d+-.+\.spi")=0) 
+                    and last(/Futur-Tech App StorageCraft/imagemanager.collapse.age[{#MACHINE},{#VOL}])>0
+                    and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip])=9
+                    and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=0 
+                    and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=0
+                  recovery_expression: |
+                    find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","{#PATH_ESC}\\{#VOL}-.+\.spi")=1
+                    and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip])=1
+                    and logeventid(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],,"1120")=1
+                    or ({$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=1
+                        or {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=1)
+            - uuid: ca85ab256935425484a5c924d5b9067d
+              expression: |
+                find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","{#PATH_ESC}")=1
+                and 
+                    (find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","[\W]{#VOL}-.+\.spi")=1 
+                    or
+                    find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","_VOL-b\d+-.+\.spi")=0) 
+                and last(/Futur-Tech App StorageCraft/imagemanager.collapse.age[{#MACHINE},{#VOL}])>0
+                and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip])=2
+                and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=0 
+                and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=0
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: |
+                find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","{#PATH_ESC}\\{#VOL}-.+\.spi")=1
+                and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip])=1
+                and logeventid(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],,"1120")=1
+                or ({$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=1
+                    or {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=1)
+              name: 'Warning in ImageManager Event Log for [{#MACHINE_UPPER}/{#VOL}]'
+              opdata: 'Last collapse age: {ITEM.LASTVALUE4}, ImageManager Log: {ITEM.VALUE1}'
+              priority: WARNING
+              manual_close: 'YES'
+              dependencies:
+                - name: 'Critical Error in ImageManager Event Log for [{#MACHINE_UPPER}/{#VOL}]'
+                  expression: |
+                    find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","{#PATH_ESC}")=1
+                    and 
+                        (find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","[\W]{#VOL}-.+\.spi")=1 
+                        or
+                        find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","_VOL-b\d+-.+\.spi")=0) 
+                    and last(/Futur-Tech App StorageCraft/imagemanager.collapse.age[{#MACHINE},{#VOL}])>0
+                    and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip])=9
+                    and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=0 
+                    and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=0
+                  recovery_expression: |
+                    find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","{#PATH_ESC}\\{#VOL}-.+\.spi")=1
+                    and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip])=1
+                    and logeventid(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],,"1120")=1
+                    or ({$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=1
+                        or {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=1)
+                - name: 'Error in ImageManager Event Log for [{#MACHINE_UPPER}/{#VOL}]'
+                  expression: |
+                    find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","{#PATH_ESC}")=1
+                    and 
+                        (find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","[\W]{#VOL}-.+\.spi")=1 
+                        or
+                        find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","_VOL-b\d+-.+\.spi")=0) 
+                    and last(/Futur-Tech App StorageCraft/imagemanager.collapse.age[{#MACHINE},{#VOL}])>0
+                    and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip])=4
+                    and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=0 
+                    and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=0
+                    and ({$STORAGECRAFT.DEST_IS_NOT_HA}=0 or logeventid(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],,"1128|1129")=0)
+                  recovery_expression: |
+                    find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","{#PATH_ESC}\\{#VOL}-.+\.spi")=1
+                    and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip])=1
+                    and logeventid(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],,"1120")=1
+                    or ({$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=1
+                        or {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=1)
+          master_item:
+            key: 'logrt[C:\Program Files (x86)\StorageCraft\ImageManager\Logs\^ImageManager\.log$,,,100,skip,,,mtime-noreread]'
+          preprocessing:
+            - type: REGEX
+              parameters:
+                - '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} (\\\\.+-cd\.spi)$'
+                - \1
+              error_handler: DISCARD_VALUE
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  // Extracts segments from server file paths for Zabbix LLD.
+                  
+                  var lld = [];
+                  var row = {};
+                  
+                  // Define the regex to capture the full path, SITECODE, MACHINE name, and VOL.
+                  var regex = /^(\\\\[^\n\r\\]+(?:.*\\([^\n\r\\]+)\\([^\n\r\\]+)\\ft-backup|.*\\([^\n\r\\]+)\\([^\n\r\\]+)))\\([^\n\r\\]*_VOL-b\d+).+\.spi$/i;
+                  
+                  var matches = regex.exec(value);
+                  
+                  if (!matches) {
+                      return JSON.stringify([]);
+                  }
+                  
+                  row["{#PATH}"] = matches[1];
+                  row["{#PATH_ESC}"] = row["{#PATH}"].replace(/\\/g, '\\\\');
+                  row["{#PATH_LOGNAME}"] = row["{#PATH}"].replace(/\\\\/g, '').replace(/\\/g, '%');
+                  
+                  if (matches[2]) {
+                      row["{#SITECODE}"] = matches[2];
+                       row["{#MACHINE}"] = matches[3];
+                  } else {
+                       if (matches[5].toUpperCase()=="FT-BACKUP") {
+                            row["{#SITECODE}"] = "NO_SITECODE";
+                            row["{#MACHINE}"] = matches[4];
+                      } else {
+                            row["{#SITECODE}"] = matches[4];
+                            row["{#MACHINE}"] = matches[5];
+                      }
+                  }
+                  
+                  row["{#MACHINE_UPPER}"] = row["{#MACHINE}"].toUpperCase();
+                  row["{#VOL}"] = matches[6];
+                  
+                  lld.push(row);
+                  
+                  return JSON.stringify(lld);
+                  
+        - uuid: f2c749937eff40aea2c0ff002d8dd8de
+          name: 'ShadowProtectSPX Discovery'
+          type: DEPENDENT
+          key: storagecraft.shadowprotectspx.discovery
+          delay: '0'
+          lifetime: 90d
+          item_prototypes:
+            - uuid: 08f48e245eb646e58503ae9dd85edb31
+              name: 'Backup [{#TASK}] log'
+              type: ZABBIX_ACTIVE
+              key: 'logrt[C:\ProgramData\StorageCraft\spx\log\^{#UUID}\.log$,,,100,skip,,,mtime-noreread]'
+              trends: '0'
+              value_type: LOG
+              logtimefmt: 'yyyy-MM-dd hh:mm:ss'
+              tags:
+                - tag: component
+                  value: backup
+                - tag: storagecraft
+                  value: shadowprotectspx
+            - uuid: 37d25aed06bc4c4680f89862e7a320f3
+              name: 'Backup [{#TASK}] age'
+              type: CALCULATED
+              key: 'shadowprotectspx.backup.age[{#UUID}]'
+              delay: 10m
+              units: uptime
+              params: |
+                now()
+                -last(//shadowprotectspx.backup.success[{#UUID}])
+              tags:
+                - tag: component
+                  value: backup
+                - tag: dashboard
+                  value: shadowprotectspx
+                - tag: storagecraft
+                  value: shadowprotectspx
+              trigger_prototypes:
+                - uuid: 311ca1eecfbe43bf94a6be97f0c91edf
+                  expression: 'last(/Futur-Tech App StorageCraft/shadowprotectspx.backup.age[{#UUID}])>{$STORAGECRAFT.BACKUP.CRIT:"{#TASK}"}'
+                  name: 'No ShadowProtectSPX Backup [{#TASK}] for more than {$STORAGECRAFT.BACKUP.CRIT:"{#TASK}"}'
+                  opdata: 'Last backup age: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                - uuid: 809868f6057e44bf8d5aaad613d7d4f0
+                  expression: 'last(/Futur-Tech App StorageCraft/shadowprotectspx.backup.age[{#UUID}])>{$STORAGECRAFT.BACKUP.WARN:"{#TASK}"}'
+                  name: 'No ShadowProtectSPX Backup [{#TASK}] for more than {$STORAGECRAFT.BACKUP.WARN:"{#TASK}"}'
+                  opdata: 'Last backup age: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  dependencies:
+                    - name: 'No ShadowProtectSPX Backup [{#TASK}] for more than {$STORAGECRAFT.BACKUP.CRIT:"{#TASK}"}'
+                      expression: 'last(/Futur-Tech App StorageCraft/shadowprotectspx.backup.age[{#UUID}])>{$STORAGECRAFT.BACKUP.CRIT:"{#TASK}"}'
+            - uuid: f0d431b58d8f4bd280efde1fe4befce8
+              name: 'Backup [{#TASK}] duration'
+              type: DEPENDENT
+              key: 'shadowprotectspx.backup.duration[{#UUID}]'
+              delay: '0'
+              units: uptime
+              preprocessing:
+                - type: CHECK_REGEX_ERROR
+                  parameters:
+                    - '.+ failure'
+                    - \0
+                  error_handler: DISCARD_VALUE
+                - type: REGEX
+                  parameters:
+                    - '\(([0-9]+) s\.\)'
+                    - \1
+              master_item:
+                key: 'shadowprotectspx.backup.job[{#UUID}]'
+              tags:
+                - tag: component
+                  value: backup
+                - tag: storagecraft
+                  value: shadowprotectspx
+            - uuid: d666f1996af04a0ba08f99f13529da8d
+              name: 'Backup [{#TASK}] latest'
+              type: DEPENDENT
+              key: 'shadowprotectspx.backup.job[{#UUID}]'
+              delay: '0'
+              trends: '0'
+              value_type: TEXT
+              preprocessing:
+                - type: REGEX
+                  parameters:
+                    - 'backuprun .+: job event created: (.+ "{#TASK}" .+)$'
+                    - \1
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: 'logrt[C:\ProgramData\StorageCraft\spx\log\^{#UUID}\.log$,,,100,skip,,,mtime-noreread]'
+              tags:
+                - tag: component
+                  value: backup
+                - tag: storagecraft
+                  value: shadowprotectspx
+            - uuid: 97997c7d388646509e5ec6de21184232
+              name: 'Backup [{#TASK}] success'
+              type: DEPENDENT
+              key: 'shadowprotectspx.backup.success[{#UUID}]'
+              delay: '0'
+              units: unixtime
+              preprocessing:
+                - type: CHECK_REGEX_ERROR
+                  parameters:
+                    - '.+ failure'
+                    - \0
+                  error_handler: DISCARD_VALUE
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      // Input string
+                      var inputStr = value;
+                      
+                      // Extract date-time and duration using regex
+                      var regex = /(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\.\d+ \((\d+) s\.\)/;
+                      var match = inputStr.match(regex);
+                      
+                      if (!match) {
+                          return "Invalid input format";
+                      }
+                      
+                      // Extracted values
+                      var dateTimeStr = match[1];
+                      var durationSeconds = parseInt(match[2], 10);
+                      
+                      // Convert the date string to a Date object
+                      var date = new Date(dateTimeStr);
+                      
+                      // Adjust for timezone
+                      var timezoneOffsetInSeconds = date.getTimezoneOffset() * 60;
+                      var adjustedTimestamp = (date.getTime() / 1000) + timezoneOffsetInSeconds + durationSeconds;
+                      
+                      return Math.floor(adjustedTimestamp).toString();
+                      
+              master_item:
+                key: 'shadowprotectspx.backup.job[{#UUID}]'
+              tags:
+                - tag: component
+                  value: backup
+                - tag: storagecraft
+                  value: shadowprotectspx
+            - uuid: 16f4f3c769ff4c74996493e1ca2ba3ce
+              name: 'Backup [{#TASK}] type'
+              type: DEPENDENT
+              key: 'shadowprotectspx.backup.type[{#UUID}]'
+              delay: '0'
+              trends: '0'
+              value_type: CHAR
+              preprocessing:
+                - type: CHECK_REGEX_ERROR
+                  parameters:
+                    - '.+ failure'
+                    - \0
+                  error_handler: DISCARD_VALUE
+                - type: REGEX
+                  parameters:
+                    - '"[^"]+" (\w+)$'
+                    - \1
+              master_item:
+                key: 'shadowprotectspx.backup.job[{#UUID}]'
+              tags:
+                - tag: component
+                  value: backup
+                - tag: storagecraft
+                  value: shadowprotectspx
+          trigger_prototypes:
+            - uuid: 3b26c86b43974798bb806d72f7c2129d
+              expression: |
+                last(/Futur-Tech App StorageCraft/shadowprotectspx.backup.age[{#UUID}])<>-1
+                and find(/Futur-Tech App StorageCraft/eventlog[Application,,,ShadowProtectSPX,,,skip],,"regexp","([Bb]ackup|[Ss]auvegarde) (\"|«\xA0){#TASK}(\"|\xA0») (on|sur) ")=1 
+                and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,ShadowProtectSPX,,,skip])=9
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: |
+                find(/Futur-Tech App StorageCraft/eventlog[Application,,,ShadowProtectSPX,,,skip],,"regexp","([Bb]ackup|[Ss]auvegarde) (\"|«\xA0){#TASK}(\"|\xA0») (on|sur) .+ (successfully finished backing up|achevée avec succès) ")=1
+                and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,ShadowProtectSPX,,,skip])=1 and logeventid(/Futur-Tech App StorageCraft/eventlog[Application,,,ShadowProtectSPX,,,skip],,"3")=1
+              name: 'Critical Error in ShadowProtectSPX Event Log [{#TASK}]'
+              opdata: 'Last backup age: {ITEM.LASTVALUE1} & ShadowProtectSPX Log: {{ITEM.VALUE2}.regsub("([\s\S]*)", \1)}'
+              priority: HIGH
+              manual_close: 'YES'
+            - uuid: b237859472fe4030bfdd282d5a4912d9
+              expression: |
+                last(/Futur-Tech App StorageCraft/shadowprotectspx.backup.age[{#UUID}])<>-1
+                and find(/Futur-Tech App StorageCraft/eventlog[Application,,,ShadowProtectSPX,,,skip],,"regexp","([Bb]ackup|[Ss]auvegarde) (\"|«\xA0){#TASK}(\"|\xA0») (on|sur) ")=1 
+                and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,ShadowProtectSPX,,,skip])=4
+                and ({$STORAGECRAFT.DEST_IS_NOT_HA}=0 or logeventid(/Futur-Tech App StorageCraft/eventlog[Application,,,ShadowProtectSPX,,,skip],,"5")=0)
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: |
+                find(/Futur-Tech App StorageCraft/eventlog[Application,,,ShadowProtectSPX,,,skip],,"regexp","([Bb]ackup|[Ss]auvegarde) (\"|«\xA0){#TASK}(\"|\xA0») (on|sur) .+ (successfully finished backing up|achevée avec succès) ")=1
+                and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,ShadowProtectSPX,,,skip])=1 and logeventid(/Futur-Tech App StorageCraft/eventlog[Application,,,ShadowProtectSPX,,,skip],,"3")=1
+              name: 'Error in ShadowProtectSPX Event Log [{#TASK}]'
+              opdata: 'Last backup age: {ITEM.LASTVALUE1} & ShadowProtectSPX Log: {{ITEM.VALUE2}.regsub("([\s\S]*)", \1)}'
+              priority: AVERAGE
+              manual_close: 'YES'
+            - uuid: ab007bfbaf194f0fb3a22954dccaae8c
+              expression: |
+                last(/Futur-Tech App StorageCraft/shadowprotectspx.backup.age[{#UUID}])<>-1 
+                and find(/Futur-Tech App StorageCraft/eventlog[Application,,,ShadowProtectSPX,,,skip],,"regexp","([Bb]ackup|[Ss]auvegarde) (\"|«\xA0){#TASK}(\"|\xA0») (on|sur) ")=1 
+                and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,ShadowProtectSPX,,,skip])=2
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: |
+                find(/Futur-Tech App StorageCraft/eventlog[Application,,,ShadowProtectSPX,,,skip],,"regexp","([Bb]ackup|[Ss]auvegarde) (\"|«\xA0){#TASK}(\"|\xA0») (on|sur) .+ (successfully finished backing up|achevée avec succès) ")=1
+                and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,ShadowProtectSPX,,,skip])=1 and logeventid(/Futur-Tech App StorageCraft/eventlog[Application,,,ShadowProtectSPX,,,skip],,"3")=1
+              name: 'Warning in ShadowProtectSPX Event Log [{#TASK}]'
+              opdata: 'Last backup age: {ITEM.LASTVALUE1} & ShadowProtectSPX Log: {{ITEM.VALUE2}.regsub("([\s\S]*)", \1)}'
+              priority: WARNING
+              manual_close: 'YES'
+          master_item:
+            key: 'logrt[C:\ProgramData\StorageCraft\spx\log\^spx_service\.log$,,,100,skip,,,mtime-noreread]'
+          preprocessing:
+            - type: REGEX
+              parameters:
+                - '----- backup run ----- .+'
+                - \0
+              error_handler: DISCARD_VALUE
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var lld = [];
+                  var row = {};
+                  
+                  var regex = /---- backup run ----- .+?BackupJob\(name=u?'([^']+)', uuid=u?'([^']+)'[\)’]/i;
+                  var matches = regex.exec(value);
+                  
+                  if (matches) {
+                      row["{#TASK}"] = matches[1];
+                      row["{#UUID}"] = matches[2];
+                      lld.push(row);
+                  } else {
+                      return JSON.stringify([]);
+                  }
+                  
+                  return JSON.stringify(lld);
+                  
+      tags:
+        - tag: app
+          value: storagecraft
+        - tag: component
+          value: backup
+        - tag: Futur-Tech
+      macros:
+        - macro: '{$STORAGECRAFT.BACKUP.CRIT}'
+          value: 5d
+          description: 'Critical max age for latest successful Backup'
+        - macro: '{$STORAGECRAFT.BACKUP.WARN}'
+          value: 3d
+          description: 'Warning max age for latest successful Backup'
+        - macro: '{$STORAGECRAFT.COLLAPSE.CHKDSK}'
+          value: '1'
+          description: 'By default, CheckDisk trigger is activated'
+        - macro: '{$STORAGECRAFT.COLLAPSE.CHKDSK.CRIT}'
+          value: 14d
+          description: 'Max age for latest successful CHKDSK on Collapse'
+        - macro: '{$STORAGECRAFT.COLLAPSE.CHKDSK.INFO}'
+          value: 1h
+          description: 'Show info of successful CHKDSK during this time'
+        - macro: '{$STORAGECRAFT.COLLAPSE.CHKDSK:"DEVT-ST001"}'
+          value: '0'
+          description: 'Exemple of macro for disabling chkdsk triggers for a specific chain of a machine.'
+        - macro: '{$STORAGECRAFT.COLLAPSE.CRIT}'
+          value: 7d
+          description: 'Critical max age for latest successful Collapse'
+        - macro: '{$STORAGECRAFT.COLLAPSE.IGNORE}'
+          value: '0'
+          description: 'By default, triggers for ImageManager are activated. Set to 1 for disable all the triggers.'
+        - macro: '{$STORAGECRAFT.COLLAPSE.IGNORE:"DEVT-ST001 [C_VOL-b001]"}'
+          value: '1'
+          description: 'Exemple of macro for disabling triggers for a specific chain of a machine.'
+        - macro: '{$STORAGECRAFT.COLLAPSE.IGNORE:"DEVT-ST001"}'
+          value: '1'
+          description: 'Exemple of macro for disabling triggers for all the chains of a machine.'
+        - macro: '{$STORAGECRAFT.COLLAPSE.VIRTUALBOOT}'
+          value: '0'
+          description: 'By default, VirtualBoot check is not activated on ImageManager'
+        - macro: '{$STORAGECRAFT.COLLAPSE.VIRTUALBOOT.CRIT}'
+          value: 40d
+          description: 'Max age for latest successful VirtualBoot on Collapse'
+        - macro: '{$STORAGECRAFT.COLLAPSE.VIRTUALBOOT.INFO}'
+          value: 1h
+          description: 'Show info of successful VirtualBoot during this time'
+        - macro: '{$STORAGECRAFT.COLLAPSE.WARN}'
+          value: 4d
+          description: 'Warning max age for latest successful Collapse'
+        - macro: '{$STORAGECRAFT.DEST_IS_NOT_HA}'
+          value: '0'
+          description: 'Set true if destination for Backup and Collapse is not always reachable. Will ignore some backups and collapse error log triggers.'
