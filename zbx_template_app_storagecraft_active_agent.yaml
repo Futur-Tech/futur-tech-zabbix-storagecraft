@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-09-14T13:50:36Z'
+  date: '2023-10-06T07:45:14Z'
   groups:
     - uuid: 7f27dc73981940769811e7fae4a26772
       name: Templates/Futur-Tech/Applications
@@ -272,13 +272,6 @@ zabbix_export:
                   name: 'CHKDSK Error for [{#MACHINE_UPPER}/{#VOL}] collapse'
                   opdata: 'Log: {{ITEM.VALUE}.regsub("(.*)", \1)}'
                   priority: AVERAGE
-                - uuid: db9c2ed17069434b91c618e5b7df5f88
-                  expression: |
-                    (now()-last(/Futur-Tech App StorageCraft/imagemanager.collapse.chkdsk.log[{#MACHINE},{#VOL}]))<{$STORAGECRAFT.COLLAPSE.CHKDSK.INFO} 
-                    and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=0 and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=0
-                  name: 'Successful CHKDSK for [{#MACHINE_UPPER}/{#VOL}] collapse in last {$STORAGECRAFT.COLLAPSE.CHKDSK.INFO}'
-                  opdata: 'Log: {ITEM.LASTVALUE1}'
-                  priority: INFO
             - uuid: 43379856a51647b190ab96a6474b83bd
               name: 'Collapse [{#MACHINE_UPPER}/{#VOL}] chkdsk success'
               type: DEPENDENT
@@ -344,6 +337,13 @@ zabbix_export:
                         find(/Futur-Tech App StorageCraft/imagemanager.collapse.chkdsk.log[{#MACHINE},{#VOL}],#1,"regexp","Chkdsk verify succeeded: {#VOL}[-\w]+\.spi \(No errors were found\)")=1
                         or ({$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=1
                             or {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=1)
+                - uuid: db9c2ed17069434b91c618e5b7df5f88
+                  expression: |
+                    (now()-last(/Futur-Tech App StorageCraft/imagemanager.collapse.chkdsk.success[{#MACHINE},{#VOL}]))<{$STORAGECRAFT.COLLAPSE.CHKDSK.INFO} 
+                    and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=0 and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=0
+                  name: 'Successful CHKDSK for [{#MACHINE_UPPER}/{#VOL}] collapse in last {$STORAGECRAFT.COLLAPSE.CHKDSK.INFO}'
+                  opdata: 'Last chkdsk: {ITEM.LASTVALUE1}'
+                  priority: INFO
             - uuid: 39a9ac7cbc784597b3d150c6b7f34c2f
               name: 'Collapse [{#MACHINE_UPPER}/{#VOL}] success log'
               type: DEPENDENT
@@ -444,7 +444,7 @@ zabbix_export:
                       expression: 'find(/Futur-Tech App StorageCraft/imagemanager.collapse.virtualboot.log[{#MACHINE}],#1,"regexp","virtual boot exception: {#VOL}[-\w]+\.spi")=1 and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=0'
                       recovery_expression: 'find(/Futur-Tech App StorageCraft/imagemanager.collapse.virtualboot.log[{#MACHINE}],#1,"regexp","^Took screenshot")=1 or ({$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=1)'
                 - uuid: b1181430467f4a568e8b567afe6b795d
-                  expression: 'find(/Futur-Tech App StorageCraft/imagemanager.collapse.virtualboot.log[{#MACHINE}],{$STORAGECRAFT.COLLAPSE.VIRTUALBOOT.INFO},"regexp","^Took screenshot")=1 and ({$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=0)'
+                  expression: 'find(/Futur-Tech App StorageCraft/imagemanager.collapse.virtualboot.log[{#MACHINE}],{$STORAGECRAFT.COLLAPSE.VIRTUALBOOT.INFO},"regexp","^Took screenshot")=1 and nodata(/Futur-Tech App StorageCraft/imagemanager.collapse.virtualboot.log[{#MACHINE}],{$STORAGECRAFT.COLLAPSE.VIRTUALBOOT.INFO})=0 and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=0'
                   name: 'Successful VirtualBoot for [{#MACHINE_UPPER}] collapse in last {$STORAGECRAFT.COLLAPSE.VIRTUALBOOT.INFO} (Verify screenshot sent by email))'
                   opdata: 'Log: {{ITEM.VALUE}.regsub("(.*)", \1)}'
                   priority: INFO
@@ -690,7 +690,7 @@ zabbix_export:
           preprocessing:
             - type: REGEX
               parameters:
-                - '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} (\\\\.+-cd\.spi)$'
+                - '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} (\\\\.+[-cdmr]+\.spi)$'
                 - \1
               error_handler: DISCARD_VALUE
             - type: JAVASCRIPT
@@ -907,7 +907,7 @@ zabbix_export:
                 find(/Futur-Tech App StorageCraft/eventlog[Application,,,ShadowProtectSPX,,,skip],,"regexp","([Bb]ackup|[Ss]auvegarde) (\"|«\xA0){#TASK}(\"|\xA0») (on|sur) .+ (successfully finished backing up|achevée avec succès) ")=1
                 and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,ShadowProtectSPX,,,skip])=1 and logeventid(/Futur-Tech App StorageCraft/eventlog[Application,,,ShadowProtectSPX,,,skip],,"3")=1
               name: 'Critical Error in ShadowProtectSPX Event Log [{#TASK}]'
-              opdata: 'Last backup age: {ITEM.LASTVALUE1} & ShadowProtectSPX Log: {{ITEM.VALUE2}.regsub("([\s\S]*)", \1)}'
+              opdata: 'Last backup age: {ITEM.LASTVALUE1} & ShadowProtectSPX Log: {ITEM.VALUE2}'
               priority: HIGH
               manual_close: 'YES'
             - uuid: b237859472fe4030bfdd282d5a4912d9
@@ -921,7 +921,7 @@ zabbix_export:
                 find(/Futur-Tech App StorageCraft/eventlog[Application,,,ShadowProtectSPX,,,skip],,"regexp","([Bb]ackup|[Ss]auvegarde) (\"|«\xA0){#TASK}(\"|\xA0») (on|sur) .+ (successfully finished backing up|achevée avec succès) ")=1
                 and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,ShadowProtectSPX,,,skip])=1 and logeventid(/Futur-Tech App StorageCraft/eventlog[Application,,,ShadowProtectSPX,,,skip],,"3")=1
               name: 'Error in ShadowProtectSPX Event Log [{#TASK}]'
-              opdata: 'Last backup age: {ITEM.LASTVALUE1} & ShadowProtectSPX Log: {{ITEM.VALUE2}.regsub("([\s\S]*)", \1)}'
+              opdata: 'Last backup age: {ITEM.LASTVALUE1} & ShadowProtectSPX Log: {ITEM.VALUE2}'
               priority: AVERAGE
               manual_close: 'YES'
             - uuid: ab007bfbaf194f0fb3a22954dccaae8c
@@ -934,7 +934,7 @@ zabbix_export:
                 find(/Futur-Tech App StorageCraft/eventlog[Application,,,ShadowProtectSPX,,,skip],,"regexp","([Bb]ackup|[Ss]auvegarde) (\"|«\xA0){#TASK}(\"|\xA0») (on|sur) .+ (successfully finished backing up|achevée avec succès) ")=1
                 and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,ShadowProtectSPX,,,skip])=1 and logeventid(/Futur-Tech App StorageCraft/eventlog[Application,,,ShadowProtectSPX,,,skip],,"3")=1
               name: 'Warning in ShadowProtectSPX Event Log [{#TASK}]'
-              opdata: 'Last backup age: {ITEM.LASTVALUE1} & ShadowProtectSPX Log: {{ITEM.VALUE2}.regsub("([\s\S]*)", \1)}'
+              opdata: 'Last backup age: {ITEM.LASTVALUE1} & ShadowProtectSPX Log: {ITEM.VALUE2}'
               priority: WARNING
               manual_close: 'YES'
           master_item:
