@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-06T07:45:14Z'
+  date: '2024-01-05T12:35:00Z'
   groups:
     - uuid: 7f27dc73981940769811e7fae4a26772
       name: Templates/Futur-Tech/Applications
@@ -584,6 +584,38 @@ zabbix_export:
                     and logeventid(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],,"1120")=1
                     or ({$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=1
                         or {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=1)
+            - uuid: d466cfe302d44a57970bc7fec9bd4663
+              expression: |
+                find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","{#PATH_ESC}")=1 
+                and last(/Futur-Tech App StorageCraft/imagemanager.collapse.age[{#MACHINE},{#VOL}])>0 
+                and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip])=2 
+                and logeventid(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],,"1130")=1
+                and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=0 
+                and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=0 
+                and {$STORAGECRAFT.DEST_IS_NOT_HA}=0
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: |
+                find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","{#PATH_ESC}\\{#VOL}-.+\.spi")=1
+                and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip])=1
+                and logeventid(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],,"1120")=1
+                
+                or ({$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=1
+                    or {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=1)
+              name: 'ImageManager inactivity threshold exceeded for [{#MACHINE_UPPER}/{#VOL}]'
+              opdata: 'Last collapse age: {ITEM.LASTVALUE2}, ImageManager Log: {ITEM.VALUE1}'
+              priority: WARNING
+              manual_close: 'YES'
+              dependencies:
+                - name: 'No ImageManager [{#MACHINE_UPPER}/{#VOL}] collapse for more than {$STORAGECRAFT.COLLAPSE.CRIT:"{#MACHINE_UPPER}"}'
+                  expression: |
+                    last(/Futur-Tech App StorageCraft/imagemanager.collapse.age[{#MACHINE},{#VOL}])>{$STORAGECRAFT.COLLAPSE.CRIT:"{#MACHINE_UPPER}"}
+                    and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=0 
+                    and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=0
+                - name: 'No ImageManager [{#MACHINE_UPPER}/{#VOL}] collapse for more than {$STORAGECRAFT.COLLAPSE.WARN:"{#MACHINE_UPPER}"}'
+                  expression: |
+                    last(/Futur-Tech App StorageCraft/imagemanager.collapse.age[{#MACHINE},{#VOL}])>{$STORAGECRAFT.COLLAPSE.WARN:"{#MACHINE_UPPER}"}
+                    and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=0 
+                    and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=0
             - uuid: 9cf48e47264c49bcb3edd11af9a2025b
               expression: |
                 find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","unable to enumerate files:")=1
@@ -609,24 +641,6 @@ zabbix_export:
               priority: WARNING
               description: 'This error is usually because of network issue'
               manual_close: 'YES'
-              dependencies:
-                - name: 'Critical Error in ImageManager Event Log for [{#MACHINE_UPPER}/{#VOL}]'
-                  expression: |
-                    find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","{#PATH_ESC}")=1
-                    and 
-                        (find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","[\W]{#VOL}-.+\.spi")=1 
-                        or
-                        find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","_VOL-b\d+-.+\.spi")=0) 
-                    and last(/Futur-Tech App StorageCraft/imagemanager.collapse.age[{#MACHINE},{#VOL}])>0
-                    and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip])=9
-                    and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=0 
-                    and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=0
-                  recovery_expression: |
-                    find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","{#PATH_ESC}\\{#VOL}-.+\.spi")=1
-                    and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip])=1
-                    and logeventid(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],,"1120")=1
-                    or ({$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=1
-                        or {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=1)
             - uuid: ca85ab256935425484a5c924d5b9067d
               expression: |
                 find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","{#PATH_ESC}")=1
@@ -636,6 +650,7 @@ zabbix_export:
                     find(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],#1,"regexp","_VOL-b\d+-.+\.spi")=0) 
                 and last(/Futur-Tech App StorageCraft/imagemanager.collapse.age[{#MACHINE},{#VOL}])>0
                 and logseverity(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip])=2
+                and logeventid(/Futur-Tech App StorageCraft/eventlog[Application,,,StorageCraft ImageManager,,,skip],,"1130")=0
                 and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER} [{#VOL}]"}=0 
                 and {$STORAGECRAFT.COLLAPSE.IGNORE:"{#MACHINE_UPPER}"}=0
               recovery_mode: RECOVERY_EXPRESSION
